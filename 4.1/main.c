@@ -15,9 +15,14 @@ void *checkInputsThread (void *arg)
         if (kbhit()){
             pressedKey = kbread();
             switch(pressedKey){
+                //BOTON 1
                 case 'b' :
                     boton_isr();
                     break;
+                //BOTON 2
+                case 'v' :
+                    boton_isr();
+                    break;    
                 case 'q' :
                     exit(-1);
                     break;
@@ -55,7 +60,7 @@ int main () {
     //Clock registers
 	struct timespec next;
 	clock_gettime(CLOCK_REALTIME, &next);
-	struct timespec T = {0, 500000000}; //Half a second
+	struct timespec T = {0, 0.5*1000000000}; //Half a second
 
     //Initialze input and output pins
     //initializePins()
@@ -66,7 +71,7 @@ int main () {
     */
     static fsm_trans_t interruptor[] = {
         { APAGADO,   boton_pulsado, ENCENDIDO, encender },
-        { ENCENDIDO, timer_acabado, APAGADO,   apagar },
+        { ENCENDIDO, boton_pulsado, APAGADO,   apagar },
         {-1, NULL, -1, NULL },
     };
     fsm_t* interruptor_fsm = fsm_new (interruptor);

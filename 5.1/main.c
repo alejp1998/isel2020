@@ -55,7 +55,7 @@ int main () {
     //Clock registers
 	struct timespec next;
 	clock_gettime(CLOCK_REALTIME, &next);
-	struct timespec T = {0, 500000000}; //Half a second
+	struct timespec T = {0, 0.5*1000000000}; //Half a second
 
     //Initialze input and output pins
     //initializePins()
