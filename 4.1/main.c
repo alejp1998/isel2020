@@ -17,11 +17,11 @@ void *checkInputsThread (void *arg)
             switch(pressedKey){
                 //BOTON 1
                 case 'b' :
-                    boton_isr();
+                    button_isr();
                     break;
                 //BOTON 2
                 case 'v' :
-                    boton_isr();
+                    button_isr();
                     break;    
                 case 'q' :
                     exit(-1);
@@ -66,18 +66,18 @@ int main () {
     //initializePins()
 
     /*
-    * Máquina de estados: lista de transiciones
-    * { EstadoOrigen, CondicionDeDisparo, EstadoFinal, AccionesSiTransicion }
+    * Finite States Machine
+    * { OriginState, Trigger, DestinationState, Actions }
     */
-    static fsm_trans_t interruptor[] = {
-        { APAGADO,   boton_pulsado, ENCENDIDO, encender },
-        { ENCENDIDO, boton_pulsado, APAGADO,   apagar },
+    static fsm_trans_t switch_def[] = {
+        { OFF,   check_pressed_button, ON, turn_on_light },
+        { ON, check_pressed_button, ON, turn_off_light },
         {-1, NULL, -1, NULL },
     };
-    fsm_t* interruptor_fsm = fsm_new (interruptor);
+    fsm_t* switch_fsm = fsm_new (switch_def);
     
     while (1) {
-        fsm_fire (interruptor_fsm);
+        fsm_fire (switch_fsm);
         timespec_add(&next,&next,&T);
         delay_until (&next);
     }

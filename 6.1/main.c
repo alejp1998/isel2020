@@ -8,7 +8,6 @@
 
 #include "alarm.h"
 
-
 //CHECK PRESSED KEYS
 void *checkInputsThread (void *arg)
 {
@@ -67,8 +66,8 @@ int main () {
     //initializePins()
 
     /*
-    * Máquina de estados: lista de transiciones
-    * { EstadoOrigen, CondicionDeDisparo, EstadoFinal, AccionesSiTransicion }
+    * Finite States Machine
+    * { OriginState, Trigger, DestinationState, Actions }
     */
     static fsm_trans_t alarm[] = {
         { IDLE,  check_presence, ALARM, start_alarm },

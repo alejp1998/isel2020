@@ -5,7 +5,7 @@ LDLIBS=-lwiringPi -pthread
 
 all: libwiringPi.a main
 
-main: main.o interruptor.o fsm.o timer.o kbhit.o
+main: main.o switch.o fsm.o timer.o kbhit.o
 
 clean:
 	$(RM) *.o *~ main libwiringPi.a

@@ -61,6 +61,7 @@ int check_alarm_off (fsm_t* this) {
   return ~alarm_state; 
 }
 
+
 //OUTPUT FUNCTIONS
 void start_alarm (fsm_t* this) {
   pir_sensor = 0;
