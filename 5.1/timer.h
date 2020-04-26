@@ -3,7 +3,7 @@
 
 #include "time.h"
 
-static struct timespec timer_endtime;
+struct timespec timer_endtime;
 
 //FSM Time Management functions
 void timespec_sub (struct timespec *res, struct timespec *a, struct timespec *b);

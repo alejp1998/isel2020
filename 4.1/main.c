@@ -1,11 +1,11 @@
 
 #include "time.h"
 #include "stdio.h"
-#include "kbhit.h"
 #include "pthread.h"
 
+#include "kbhit.h"
+
 #include "interruptor.h"
-#include "timer.h"
 
 //CHECK PRESSED KEYS
 void *checkInputsThread (void *arg)

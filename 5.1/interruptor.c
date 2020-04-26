@@ -20,6 +20,7 @@
 #include "interruptor.h"
 
 static int boton = 0;
+static int timer_ended = 0;
 static int debounceTime = DEBOUNCE_TIME;
 
 //Button interruption
@@ -31,8 +32,13 @@ void boton_isr (void) {
     return;
   }
 
-  boton = 1; 
+  boton = 1;
+
   debounceTime = millis() + DEBOUNCE_TIME;
+}
+
+void timer_isr(void) {
+  timer_ended = 1;
 }
 
 //Funcion de estado de las entradas
@@ -40,12 +46,19 @@ int boton_pulsado (fsm_t* this) {
   return boton; 
 }
 
+int timer_acabado (fsm_t* this) { 
+  return timer_ended; 
+}
+
 //Funciones de salida
-void encender (fsm_t* this) { 
-  boton = 0; 
+void encender (fsm_t* this) {
+  //Start timer
+  boton = 0;
+  timer_ended = 0;
+  timer_start(TIMER_PERIOD);
   digitalWrite (GPIO_LIGHT, 1); 
 }
 void apagar (fsm_t* this) { 
-  boton = 0; 
+  timer_ended = 0;
   digitalWrite (GPIO_LIGHT, 0); 
 }

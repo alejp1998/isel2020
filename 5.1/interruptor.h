@@ -15,6 +15,8 @@
 
 #define DEBOUNCE_TIME 200
 
+#define TIMER_PERIOD 10
+
 enum fsm_state {
   ENCENDIDO,
   APAGADO,
@@ -26,6 +28,7 @@ void timer_isr (void);
 
 //Prototipos funciones de entrada
 int boton_pulsado (fsm_t* this);
+int timer_acabado (fsm_t* this);
 
 //Prototipos funciones de salida
 void encender (fsm_t* this);

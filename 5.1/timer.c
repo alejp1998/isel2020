@@ -39,18 +39,13 @@ void delay_until (struct timespec* next_activation)
 }
 
 
-/*
-static void timer_isr (union sigval arg) 
-{ 
-	timer = 1; 
-}*/
-
 void timer_start (int s) 
 { 
-	struct timespec inc = { s, 0};
+	struct timespec inc = {s, 0};
 	clock_gettime(CLOCK_REALTIME, &timer_endtime);
 	timespec_add (&timer_endtime, &timer_endtime, &inc);
 }
+
 
 int timer_finished (void) 
 {

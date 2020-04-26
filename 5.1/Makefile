@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-g -Wall -O -I. -DNDEBUG
 LDFLAGS=-L.
-LDLIBS=-lwiringPi -pthread -lncurses
+LDLIBS=-lwiringPi -pthread
 
 all: libwiringPi.a main
 

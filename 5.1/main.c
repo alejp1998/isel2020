@@ -1,11 +1,13 @@
 
 #include "time.h"
 #include "stdio.h"
-#include "kbhit.h"
 #include "pthread.h"
 
-#include "interruptor.h"
 #include "timer.h"
+#include "kbhit.h"
+
+#include "interruptor.h"
+
 
 //CHECK PRESSED KEYS
 void *checkInputsThread (void *arg)
@@ -16,6 +18,9 @@ void *checkInputsThread (void *arg)
             pressedKey = kbread();
             switch(pressedKey){
                 case 'b' :
+                    boton_isr();
+                    break;
+                case 'v' :
                     boton_isr();
                     break;
                 case 'q' :
@@ -45,7 +50,6 @@ void *checkInputsThread (void *arg)
 
 int main () {
 
-    
     //Thread that checks inputs in keyboard and triggers interruption functions
 	pthread_t thInputs;
 	if ( 0 != pthread_create(&thInputs, NULL, checkInputsThread, NULL) ) {
@@ -66,6 +70,7 @@ int main () {
     */
     static fsm_trans_t interruptor[] = {
         { APAGADO,   boton_pulsado, ENCENDIDO, encender },
+        { ENCENDIDO, boton_pulsado, ENCENDIDO, encender },
         { ENCENDIDO, timer_acabado, APAGADO,   apagar },
         {-1, NULL, -1, NULL },
     };
