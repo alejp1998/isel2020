@@ -15,9 +15,7 @@
 
 #define DEBOUNCE_TIME 200
 
-#define TIMER_PERIOD 10
-
-enum fsm_state {
+enum alarm_fsm_states {
   INACTIVE,
   ACTIVE,
   TRIGGERED
@@ -35,5 +33,8 @@ int check_alarm_state (fsm_t* this);
 void activate_alarm    (fsm_t* this);
 void deactivate_alarm  (fsm_t* this);
 void trigger_alarm     (fsm_t* this);
+
+//FSM DEFINITION
+fsm_trans_t alarm[];
 
 #endif
