@@ -6,8 +6,7 @@
 #include "stdlib.h"
 #include "wiringPi.h"
 #include "fsm.h"
-
-#define CLK_MS 100
+#include "stdio.h"
 
 #define GPIO_PIR	    12
 #define GPIO_ALARM_ST	14
@@ -19,21 +18,22 @@
 #define TIMER_PERIOD 10
 
 enum fsm_state {
-  IDLE,
-  ALARM,
+  INACTIVE,
+  ACTIVE,
+  TRIGGERED
 };
 
 //INTERRUPTIONS
-void pir_isr (void);
+void pir_isr         (void);
 void alarm_state_isr (void);
 
 //STATE CHECKING
-int check_presence (fsm_t* this);
-int check_alarm_off(fsm_t* this);
+int check_presence    (fsm_t* this);
+int check_alarm_state (fsm_t* this);
 
 //OUTPUT FUNCTIONS
-void start_alarm (fsm_t* this);
-void stop_alarm  (fsm_t* this);
-void ignore_presence  (fsm_t* this);
+void activate_alarm    (fsm_t* this);
+void deactivate_alarm  (fsm_t* this);
+void trigger_alarm     (fsm_t* this);
 
 #endif

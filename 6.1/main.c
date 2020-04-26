@@ -17,11 +17,9 @@ void *checkInputsThread (void *arg)
             pressedKey = kbread();
             switch(pressedKey){
                 case 's' :
-                    printf("ALARM STATE SWITCHED \n");
                     alarm_state_isr();
                     break;
                 case 'p' :
-                    printf("PRESENCE DETECTED \n");
                     pir_isr();
                     break;
                 case 'q' :
@@ -70,9 +68,10 @@ int main () {
     * { OriginState, Trigger, DestinationState, Actions }
     */
     static fsm_trans_t alarm[] = {
-        { IDLE,  check_presence, ALARM, start_alarm },
-        { IDLE, check_alarm_off, IDLE, ignore_presence },
-        { ALARM, check_alarm_off, IDLE, stop_alarm },
+        { INACTIVE,  check_alarm_state, ACTIVE, activate_alarm },
+        { ACTIVE, check_alarm_state, INACTIVE, deactivate_alarm },
+        { ACTIVE, check_presence, TRIGGERED, trigger_alarm },
+        { TRIGGERED, check_alarm_state, INACTIVE, deactivate_alarm },
         {-1, NULL, -1, NULL },
     };
     fsm_t* alarm_fsm = fsm_new (alarm);

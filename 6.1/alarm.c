@@ -1,21 +1,3 @@
-/* FSM example
-
-   Copyright (C) 2017 by Jose M. Moya
-
-   This file is part of GreenLSI Unlessons.
-
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include "alarm.h"
 
@@ -46,7 +28,7 @@ void alarm_state_isr (void) {
   }
 
   //Switch bit state 
-  alarm_state = ~alarm_state;
+  alarm_state = 1;
 
   debounceTime = millis() + DEBOUNCE_TIME;
 }
@@ -54,33 +36,38 @@ void alarm_state_isr (void) {
 
 //STATE CHECKING FUNCTIONS
 int check_presence (fsm_t* this) { 
-  return pir_sensor & alarm_state; 
+  return pir_sensor; 
 }
 
-int check_alarm_off (fsm_t* this) { 
-  return ~alarm_state; 
+int check_alarm_state (fsm_t* this) { 
+  return alarm_state; 
 }
 
 
 //OUTPUT FUNCTIONS
-void start_alarm (fsm_t* this) {
+void activate_alarm (fsm_t* this) {
   pir_sensor = 0;
+  alarm_state = 0;
 
-  printf("ALARM ON \n");
-
-  //Turn light and alarm off
-  digitalWrite (GPIO_LIGHT, 1); 
-  digitalWrite (GPIO_BUZZER, 1); 
+  printf("ALARM ACTIVATED \n");
 }
-void stop_alarm (fsm_t* this) { 
+void deactivate_alarm (fsm_t* this) { 
   pir_sensor = 0;
+  alarm_state = 0;
 
-  printf("ALARM STOPPED \n");
+  printf("ALARM DEACTIVATED \n");
 
-  //Turn light and alarm on
+  //Turn light and buzzer off
   digitalWrite (GPIO_LIGHT, 0); 
   digitalWrite (GPIO_BUZZER, 0); 
 }
-void ignore_presence (fsm_t* this) { 
+void trigger_alarm (fsm_t* this) { 
   pir_sensor = 0;
+  alarm_state = 0;
+
+  printf("PRESENCE DETECTED: ALARM TRIGGERED!!! \n");
+
+  //Turn light and buzzer on
+  digitalWrite (GPIO_LIGHT, 1); 
+  digitalWrite (GPIO_BUZZER, 1); 
 }
