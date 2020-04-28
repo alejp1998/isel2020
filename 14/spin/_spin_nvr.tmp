@@ -1,0 +1,45 @@
+never button_is_followed_by_light {    /* !([] ((! ((button1) || (button2))) || (<> (light)))) */
+T0_init:
+	do
+	:: (! ((! ((button1) || (button2)))) && ! ((light))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! ((light))) -> goto accept_S4
+	od;
+}
+never light_until_end_of_timer {    /* !([] (([] (light)) || ((light) U (T)))) */
+T0_init:
+	do
+	:: (! ((T)) && ! ((light))) -> goto accept_S11
+	:: atomic { (! ((T)) && ! ((light))) -> assert(!(! ((T)) && ! ((light)))) }
+	:: (! ((T))) -> goto T0_S14
+	:: (! ((T)) && ! ((light))) -> goto accept_S2
+	:: (1) -> goto T0_init
+	od;
+accept_S11:
+	do
+	:: (! ((T))) -> goto accept_S11
+	:: atomic { (! ((T)) && ! ((light))) -> assert(!(! ((T)) && ! ((light)))) }
+	od;
+accept_S2:
+	do
+	:: atomic { (! ((light))) -> assert(!(! ((light)))) }
+	:: (1) -> goto T0_S2
+	od;
+T0_S14:
+	do
+	:: (! ((T)) && ! ((light))) -> goto accept_S11
+	:: atomic { (! ((T)) && ! ((light))) -> assert(!(! ((T)) && ! ((light)))) }
+	:: (! ((T))) -> goto T0_S14
+	:: (! ((T)) && ! ((light))) -> goto accept_S2
+	od;
+T0_S2:
+	do
+	:: atomic { (! ((light))) -> assert(!(! ((light)))) }
+	:: (1) -> goto T0_S2
+	od;
+accept_all:
+	skip
+}

@@ -24,8 +24,7 @@ static const struct timeval code_period = {0, 50*1000000};
 
 //CHECK PRESSED KEYS
 static const struct timeval key_period = {0, 50*1000000};
-void processKey()
-{
+void processKey() {
     char pressedKey;
     if(kbhit()){
         pressedKey = kbread();
@@ -82,7 +81,7 @@ static void switch_task (struct event_handler_t* this) {
 }
 
 //Initialize events handler
-void reactor_events_init (void) {
+void reactor_events_init () {
     EventHandler task_processKey, task_alarm, task_code, task_switch;
 
     reactor_init();
@@ -128,7 +127,7 @@ int main () {
     fsm_t* code_fsm = fsm_new (alarm);
 
     //WELCOME MESSAGE
-    printf("\n---------------------------------------------------------------------------------\n");
+    printf("\n-----------------------------------------------------------------------------------\n");
     printf("WELCOME!!! \n\n");
     printf("Controls: \n");
     printf("'v' or 'b' -> Turn light on (turned off automatically). \n");

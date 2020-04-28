@@ -1,7 +1,31 @@
 
 
 //SPECIFICATIONS
+//Switch model
+ltl button_is_followed_by_light {
+	[]((button1 || button2) -> <>light);
+}
+ltl light_until_end_of_timer {
+	[](light W T);
+}
 
+/*
+//Code model
+ltl digit_processed_after_count_limit_or_timeout {
+	[]((T || (count >= COUNT_LIMIT) && (code_st == COUNT)) -> <>(code_st == PROCESS_DIGIT));
+}
+ltl three_digits_code_entered {
+	[](((index+1) > CODE_LENGTH) -> <>alarm_code);
+}
+
+//Alarm code
+ltl alarm_deactivation_after_code_entered {
+	[]( (((alarm_st==TRIGGERED) || (alarm_st==ACTIVE)) && alarm_code) -> <>(alarm_st==INACTIVE));
+}
+ltl alarm_triggered_after_pir_if_active {
+	[]((ACTIVE && pir_sensor) -> <>((alarm_st==TRIGGERED) && led && buzzer));
+}
+*/
 
 //Timers setup
 int T; //Set to 1 when there is a timeout
