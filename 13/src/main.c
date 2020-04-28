@@ -1,7 +1,10 @@
 
 #include "time.h"
 #include "stdio.h"
-#include "pthread.h"
+
+#include <sys/select.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #include "timer.h"
 #include "kbhit.h"
@@ -9,6 +12,11 @@
 #include "switch.h"
 #include "alarm.h"
 #include "code.h"
+
+//FSM Declarations
+fsm_t* switch_fsm;
+fsm_t* alarm_fsm;
+fsm_t* code_fsm;
 
 //CHECK PRESSED KEYS
 void processKey()
@@ -38,7 +46,69 @@ void processKey()
     }
 }
 
-/*void initializePins ()
+
+//FREERTOS 
+//Process key task
+static void processKey_task (void* ignore) {
+    portTickType period =  50 /portTICK_RATE_MS;
+
+    portTickType last = xTaskGetTickCount();
+
+    while (1) {
+        processKey();
+        vTaskDelayUntil (&last, period);
+    }
+}
+
+//Alarm fsm task
+static void alarm_task (void* ignore) {
+    portTickType period =  250 /portTICK_RATE_MS;
+
+    portTickType last = xTaskGetTickCount();
+
+    while (1) {
+        fsm_fire(alarm_fsm);
+        vTaskDelayUntil (&last, period);
+    }
+}
+
+//Code fsm task
+static void code_task (void* ignore) {
+    portTickType period =  50 /portTICK_RATE_MS;
+
+    portTickType last = xTaskGetTickCount();
+
+    while (1) {
+        fsm_fire(code_fsm);
+        vTaskDelayUntil (&last, period);
+    }
+}
+
+//Switch fsm task
+static void switch_task (void* ignore) {
+    portTickType period =  500 /portTICK_RATE_MS;
+
+    portTickType last = xTaskGetTickCount();
+
+    while (1) {
+        fsm_fire(switch_fsm);
+        vTaskDelayUntil (&last, period);
+    }
+}
+
+void user_init (void) {
+    xTaskHandle task_processKey, task_alarm, task_code, task_switch;
+    xTaskCreate (processKey_task, (const signed char*) "processKey", 2048, NULL, 1, &task_processKey);
+    xTaskCreate (alarm_task, (const signed char*) "alarm", 2048, NULL, 1, &task_alarm);
+    xTaskCreate (code_task, (const signed char*) "code", 2048, NULL, 1, &task_code);
+    xTaskCreate (switch_task, (const signed char*) "switch", 2048, NULL, 1, &task_switch);
+}
+
+void vApplicationIdleHook (void) {}
+void vMainQueueSendPassed (void) {}
+
+/*
+void initializePins ()
 {
 	wiringPiSetup();
     pinMode (GPIO_BUTTON1, INPUT);
@@ -52,19 +122,14 @@ void processKey()
 
 int main () {
 
-    //Clock registers
-	struct timespec next;
-	clock_gettime(CLOCK_REALTIME, &next);
-	struct timespec T = {0, 0.050*1000000000};
+    //Initialze input and output pins
+    //initializePins()
 
     //Initialize timers
     tmr_t* tmr1 = tmr_new(timer_code_isr);
     code_timer = tmr1;
     tmr_t* tmr2 = tmr_new(timer_switch_isr);
     switch_timer = tmr2;
-
-    //Initialze input and output pins
-    //initializePins()
 
     /*
     * Finite States Machine
@@ -84,60 +149,10 @@ int main () {
     printf("    'q'    -> Exit program. \n");
     printf("-----------------------------------------------------------------------------------\n\n");
 
-    //Frame index
-    int frame = 0;
+    //Initialize user
+    user_init();
 
-    while (1) {
-        //Read pressed keys
-        processKey();
+    //Start tasks scheduling
+    vTaskStartScheduler();
 
-        /* 
-        CYCLIC EXECUTIVE
-            CODE_FSM   -> T = 50ms
-            ALARM_FSM  -> T = 250ms
-            SWITCH_FSM -> T = 500ms
-        */
-        switch (frame) {
-			case 0:
-				fsm_fire (code_fsm);
-                fsm_fire (alarm_fsm);
-                fsm_fire (switch_fsm);
-				break;
-			case 1:
-				fsm_fire (code_fsm);
-				break;
-			case 2:
-				fsm_fire (code_fsm);
-				break;
-			case 3:
-				fsm_fire (code_fsm);
-				break;
-            case 4:
-				fsm_fire (code_fsm);
-				break;
-			case 5:
-				fsm_fire (code_fsm);
-                fsm_fire (alarm_fsm);
-                break;
-			case 6:
-				fsm_fire (code_fsm);
-				break;
-            case 7:
-				fsm_fire (code_fsm);
-				break;
-			case 8:
-				fsm_fire (code_fsm);
-				break;
-			case 9:
-				fsm_fire (code_fsm);
-				break;
-		}
-
-        //Delay next execution
-        timespec_add(&next,&next,&T);
-        delay_until (&next);
-
-        //Increment frame index
-        frame = (frame+1)%10;
-    }
 }

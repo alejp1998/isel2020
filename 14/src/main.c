@@ -82,7 +82,7 @@ int main () {
     printf("    'k'    -> Enter digit of alarm code (wait 1sec to enter next digit). \n");
     printf("    'p'    -> Trigger presence sensor (PIR). \n");
     printf("    'q'    -> Exit program. \n");
-    printf("-----------------------------------------------------------------------------------\n\n");
+    printf("-----------------------------------------------------------------------------------\n");
 
     //Frame index
     int frame = 0;
