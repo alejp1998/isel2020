@@ -1,16 +1,5 @@
 #!bin/bash
 
-#
-#	Script que muestra como se cumplen todas las especificaciones 
-#	del ejercicio de las carreteras propuesto en clase de ISEL
-#	2020 (cuando se cumplan)
-#
-#	author: Miguel Taibo
-#	date 27/02/2020
-#
-# usage:
-#   bash comprobacion.sh
-
 spin -a carretera.pml
 gcc -o pan pan.c
 

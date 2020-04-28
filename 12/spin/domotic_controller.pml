@@ -266,13 +266,13 @@ active proctype alarm_fsm () {
 
 // ENVIRONMENT MODEL
 active proctype environment () {
-	///*
+	
 	printf ("\n---------------------------------------------------------------------------\n");
 	printf ("\n SWITCH FSM --- ST:%d, T:%d, B1:%d, B2:%d, Light:%d \n", switch_st, T, button1, button2, light);
 	printf ("\n CODE FSM   --- ST:%d, T:%d, Key:%d, Count:%d, Index:%d, CodeOK:%d \n", code_st, T, key, count, index, alarm_code);
 	printf ("\n ALARM FSM  --- ST:%d, CodeOK:%d, PIR:%d, Led:%d, Buzzer:%d \n", code_st, alarm_code, pir_sensor, led, buzzer);
 	printf ("\n---------------------------------------------------------------------------\n");
-	//*/
+
 	do
 	::	if
 		:: !(button1 || button2 || key || pir_sensor) -> skip
@@ -282,13 +282,11 @@ active proctype environment () {
 		:: pir_sensor = 1;
 		fi;
 
-		///*
 		printf ("\n---------------------------------------------------------------------------\n");
 		printf ("\n SWITCH FSM --- ST:%d, T:%d, B1:%d, B2:%d, Light:%d \n", switch_st, T, button1, button2, light);
 		printf ("\n CODE FSM   --- ST:%d, T:%d, Key:%d, Count:%d, Index:%d, CodeOK:%d \n", code_st, T, key, count, index, alarm_code);
 		printf ("\n ALARM FSM  --- ST:%d, CodeOK:%d, PIR:%d, Led:%d, Buzzer:%d \n", code_st, alarm_code, pir_sensor, led, buzzer);
 		printf ("\n---------------------------------------------------------------------------\n");
-		//*/
 	od;
 }
 

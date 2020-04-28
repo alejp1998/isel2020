@@ -11,36 +11,29 @@
 #include "code.h"
 
 //CHECK PRESSED KEYS
-void *checkInputsThread (void *arg)
+void processKey()
 {
-	char pressedKey;
-	while (1){
-        if (kbhit()){
-            pressedKey = kbread();
-            switch(pressedKey){
-                case 'b' :
-                    button_isr();
-                    break;
-                case 'v' :
-                    button_isr();
-                    break;
-                case 'k' :
-                    key_isr();
-                    break;
-                case 'p' :
-                    pir_isr();
-                    break;
-                case 'q' :
-                    exit(-1);
-                    break;
-                default : 
-                    break;
-            }
-        }   
-        else 
-            continue;
+    char pressedKey;
+    pressedKey = kbread();
+    switch(pressedKey){
+        case 'b' :
+            button_isr();
+            break;
+        case 'v' :
+            button_isr();
+            break;
+        case 'k' :
+            key_isr();
+            break;
+        case 'p' :
+            pir_isr();
+            break;
+        case 'q' :
+            exit(-1);
+            break;
+        default : 
+            break;
     }
-	pthread_exit(NULL);
 }
 
 /*void initializePins ()
@@ -57,16 +50,10 @@ void *checkInputsThread (void *arg)
 
 int main () {
 
-    //Thread that checks inputs in keyboard and triggers interruption functions
-	pthread_t thInputs;
-	if ( 0 != pthread_create(&thInputs, NULL, checkInputsThread, NULL) ) {
-		printf("Thread not started\n");
-	}
-
     //Clock registers
 	struct timespec next;
 	clock_gettime(CLOCK_REALTIME, &next);
-	struct timespec T = {0, 0.025*1000000000};
+	struct timespec T = {0, 0.050*1000000000};
 
     //Initialize timers
     tmr_t* tmr1 = tmr_new(timer_code_isr);
@@ -95,13 +82,62 @@ int main () {
     printf("    'q'    -> Exit program. \n");
     printf("-----------------------------------------------------------------------------------\n");
 
+    //Frame index
+    int frame = 0;
 
     while (1) {
-        fsm_fire (switch_fsm);
-        fsm_fire (alarm_fsm);
-        fsm_fire (code_fsm);
+        //Read pressed keys
+        if (kbhit()){
+            processKey();
+        }
 
+        /* 
+        CYCLIC EXECUTIVE
+            CODE_FSM   -> T = 50ms
+            ALARM_FSM  -> T = 250ms
+            SWITCH_FSM -> T = 500ms
+        */
+        switch (frame) {
+			case 0:
+				fsm_fire (code_fsm);
+                fsm_fire (alarm_fsm);
+                fsm_fire (switch_fsm);
+				break;
+			case 1:
+				fsm_fire (code_fsm);
+				break;
+			case 2:
+				fsm_fire (code_fsm);
+				break;
+			case 3:
+				fsm_fire (code_fsm);
+				break;
+            case 4:
+				fsm_fire (code_fsm);
+				break;
+			case 5:
+				fsm_fire (code_fsm);
+                fsm_fire (alarm_fsm);
+                break;
+			case 6:
+				fsm_fire (code_fsm);
+				break;
+            case 7:
+				fsm_fire (code_fsm);
+				break;
+			case 8:
+				fsm_fire (code_fsm);
+				break;
+			case 9:
+				fsm_fire (code_fsm);
+				break;
+		}
+
+        //Delay next execution
         timespec_add(&next,&next,&T);
         delay_until (&next);
+
+        //Increment frame index
+        frame = (frame+1)%10;
     }
 }
