@@ -23,6 +23,7 @@ static const struct timeval code_period = {0, 50*1000000};
 
 
 //CHECK PRESSED KEYS
+static const struct timeval key_period = {0, 50*1000000};
 void processKey()
 {
     char pressedKey;
@@ -54,8 +55,6 @@ void processKey()
 //REACTOR EVENTS
 //Process key task and update timers state
 static void processKey_task (struct event_handler_t* this) {
-    static const struct timeval key_period = {0, 50*1000000};
-
     processKey();
 
     update_code_timer();
@@ -66,24 +65,18 @@ static void processKey_task (struct event_handler_t* this) {
 
 //Alarm fsm task
 static void alarm_task (struct event_handler_t* this) {
-    static const struct timeval alarm_period = {0, 250*1000000};
-
     fsm_fire(alarm_fsm);
     timeval_add (&this->next_activation, &this->next_activation, &alarm_period);
 }
 
 //Code fsm task
 static void code_task (struct event_handler_t* this) {
-    static const struct timeval code_period = {0, 50*1000000};
-
     fsm_fire(code_fsm);
     timeval_add (&this->next_activation, &this->next_activation, &code_period);
 }
 
 //Switch fsm task
 static void switch_task (struct event_handler_t* this) {
-    static const struct timeval switch_period = {0, 500*1000000};
-
     fsm_fire(switch_fsm);
     timeval_add (&this->next_activation, &this->next_activation, &switch_period);
 }
