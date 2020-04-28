@@ -2,11 +2,11 @@
 #include "time.h"
 #include "stdio.h"
 
-#include <sys/select.h>
+#include "termios.h"
+#include "sys/select.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "timer.h"
 #include "kbhit.h"
 
 #include "switch.h"
@@ -48,14 +48,21 @@ void processKey()
 
 
 //FREERTOS 
-//Process key task
+//Process key task and update timers state
 static void processKey_task (void* ignore) {
     portTickType period =  50 /portTICK_RATE_MS;
 
     portTickType last = xTaskGetTickCount();
 
+    start_code_timer();
+    start_switch_timer();
+
     while (1) {
         processKey();
+
+        update_code_timer();
+        update_switch_timer();
+
         vTaskDelayUntil (&last, period);
     }
 }
@@ -98,14 +105,15 @@ static void switch_task (void* ignore) {
 
 void user_init (void) {
     xTaskHandle task_processKey, task_alarm, task_code, task_switch;
-    xTaskCreate (processKey_task, (const signed char*) "processKey", 2048, NULL, 1, &task_processKey);
-    xTaskCreate (alarm_task, (const signed char*) "alarm", 2048, NULL, 1, &task_alarm);
-    xTaskCreate (code_task, (const signed char*) "code", 2048, NULL, 1, &task_code);
+    xTaskCreate (processKey_task, (const signed char*) "processKey", 2048, NULL, 4, &task_processKey);
+    xTaskCreate (code_task, (const signed char*) "code", 2048, NULL, 3, &task_code);
+    xTaskCreate (alarm_task, (const signed char*) "alarm", 2048, NULL, 2, &task_alarm);
     xTaskCreate (switch_task, (const signed char*) "switch", 2048, NULL, 1, &task_switch);
 }
 
 void vApplicationIdleHook (void) {}
 void vMainQueueSendPassed (void) {}
+
 
 /*
 void initializePins ()
@@ -124,12 +132,6 @@ int main () {
 
     //Initialze input and output pins
     //initializePins()
-
-    //Initialize timers
-    tmr_t* tmr1 = tmr_new(timer_code_isr);
-    code_timer = tmr1;
-    tmr_t* tmr2 = tmr_new(timer_switch_isr);
-    switch_timer = tmr2;
 
     /*
     * Finite States Machine

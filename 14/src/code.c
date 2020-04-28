@@ -14,26 +14,17 @@ fsm_trans_t code[] = {
 
 const int correct_code[CODE_LENGTH] = {1, 2, 3};
 
+static int ticks = 0;
 static int key = 0;
 static int timer_ended = 0;
 static int count = 0;
 static int index = 0;
 static int current_code[CODE_LENGTH] = {0,0,0};
 
-static int debounceTime = DEBOUNCE_TIME;
 
 //INTERRUPTIONS ROUTINES
 void key_isr (void) { 
-
-  //Debouncing procedure
-  if (millis() < debounceTime){
-    debounceTime = millis() + DEBOUNCE_TIME;
-    return;
-  }
-
   key = 1;
-
-  debounceTime = millis() + DEBOUNCE_TIME;
 }
 
 void timer_code_isr (void) { 
@@ -70,7 +61,7 @@ void increase_count (fsm_t* this) {
     timer_ended = 0;
 
     count++;
-    tmr_startms(code_timer,CODE_TMR_PERIOD);
+    start_code_timer();
 
     printf("COUNT INCREASED TO '%d' \n",count);
 }
@@ -121,4 +112,23 @@ void examine_code (fsm_t* this) {
     }
 
     index = 0;
+}
+
+
+//TIMER UPDATE
+void start_code_timer(){
+  ticks = 0;
+}
+
+void update_code_timer(){
+  if ((ticks > -1) & (ticks < CODE_TMR_TICKS)){
+    //Increase ticks
+    ticks++;
+  } else if (ticks >= CODE_TMR_TICKS) {
+    //Set ticks to -1
+    ticks = -1;
+    //Trigger function
+    timer_code_isr();
+  }
+  printf("%d",ticks);
 }

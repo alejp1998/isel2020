@@ -7,13 +7,10 @@
 #include "wiringPi.h"
 #include "fsm.h"
 #include "stdio.h"
-#include "timer.h"
 
 #define GPIO_CODE_BUTTON 16
 
-#define DEBOUNCE_TIME 50
-
-#define CODE_TMR_PERIOD 1000
+#define CODE_TMR_TICKS 20
 #define COUNT_LIMIT 10
 #define CODE_LENGTH 3
 
@@ -24,7 +21,9 @@ enum code_fsm_state {
   BUFFER_DIGIT
 };
 
-tmr_t* code_timer;
+//TIMER UPDATE
+void start_code_timer();
+void update_code_timer();
 
 //INTERRUPTIONS
 void key_isr   (void);

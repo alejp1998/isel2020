@@ -7,22 +7,21 @@
 #include "wiringPi.h"
 #include "fsm.h"
 #include "stdio.h"
-#include "timer.h"
 
 #define GPIO_BUTTON1	2
 #define GPIO_BUTTON2	3
 #define GPIO_LIGHT	  4
 
-#define DEBOUNCE_TIME 200
-
-#define SWITCH_TMR_PERIOD 10000
+#define SWITCH_TMR_TICKS 200
 
 enum fsm_state {
   ON,
   OFF,
 };
 
-tmr_t* switch_timer;
+//TIMER UPDATE
+void start_switch_timer();
+void update_switch_timer();
 
 //INTERRUPTIONS ROUTINES
 void button_isr (void);

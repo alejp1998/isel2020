@@ -1,14 +1,26 @@
 
 #include "time.h"
 #include "stdio.h"
-#include "pthread.h"
 
-#include "timer.h"
+#include "reactor.h"
+
 #include "kbhit.h"
 
 #include "switch.h"
 #include "alarm.h"
 #include "code.h"
+
+//FSM Declarations
+fsm_t* switch_fsm;
+static const struct timeval switch_period = {0, 500*1000000};
+
+fsm_t* alarm_fsm;
+static const struct timeval alarm_period = {0, 250*1000000};
+
+fsm_t* code_fsm;
+static const struct timeval code_period = {0, 50*1000000};
+
+
 
 //CHECK PRESSED KEYS
 void processKey()
@@ -38,7 +50,66 @@ void processKey()
     }
 }
 
-/*void initializePins ()
+
+//REACTOR EVENTS
+//Process key task and update timers state
+static void processKey_task (struct event_handler_t* this) {
+    static const struct timeval key_period = {0, 50*1000000};
+
+    processKey();
+
+    update_code_timer();
+    update_switch_timer();
+
+    timeval_add (&this->next_activation, &this->next_activation, &key_period);
+}
+
+//Alarm fsm task
+static void alarm_task (struct event_handler_t* this) {
+    static const struct timeval alarm_period = {0, 250*1000000};
+
+    fsm_fire(alarm_fsm);
+    timeval_add (&this->next_activation, &this->next_activation, &alarm_period);
+}
+
+//Code fsm task
+static void code_task (struct event_handler_t* this) {
+    static const struct timeval code_period = {0, 50*1000000};
+
+    fsm_fire(code_fsm);
+    timeval_add (&this->next_activation, &this->next_activation, &code_period);
+}
+
+//Switch fsm task
+static void switch_task (struct event_handler_t* this) {
+    static const struct timeval switch_period = {0, 500*1000000};
+
+    fsm_fire(switch_fsm);
+    timeval_add (&this->next_activation, &this->next_activation, &switch_period);
+}
+
+//Initialize events handler
+void reactor_events_init (void) {
+    EventHandler task_processKey, task_alarm, task_code, task_switch;
+
+    reactor_init();
+
+    event_handler_init (&task_processKey, 4, processKey_task);
+    reactor_add_handler (&task_processKey);
+
+    event_handler_init (&task_code, 3, code_task);
+    reactor_add_handler (&task_code);
+
+    event_handler_init (&task_alarm, 2, alarm_task);
+    reactor_add_handler (&task_alarm);
+
+    event_handler_init (&task_switch, 1, switch_task);
+    reactor_add_handler (&task_switch);
+}
+
+
+/*
+void initializePins ()
 {
 	wiringPiSetup();
     pinMode (GPIO_BUTTON1, INPUT);
@@ -52,17 +123,6 @@ void processKey()
 
 int main () {
 
-    //Clock registers
-	struct timespec next;
-	clock_gettime(CLOCK_REALTIME, &next);
-	struct timespec T = {0, 0.050*1000000000};
-
-    //Initialize timers
-    tmr_t* tmr1 = tmr_new(timer_code_isr);
-    code_timer = tmr1;
-    tmr_t* tmr2 = tmr_new(timer_switch_isr);
-    switch_timer = tmr2;
-
     //Initialze input and output pins
     //initializePins()
 
@@ -72,7 +132,7 @@ int main () {
     */
     fsm_t* switch_fsm = fsm_new (switch_def);
     fsm_t* alarm_fsm = fsm_new (alarm);
-    fsm_t* code_fsm = fsm_new (code);
+    fsm_t* code_fsm = fsm_new (alarm);
 
     //WELCOME MESSAGE
     printf("\n---------------------------------------------------------------------------------\n");
@@ -82,62 +142,14 @@ int main () {
     printf("    'k'    -> Enter digit of alarm code (wait 1sec to enter next digit). \n");
     printf("    'p'    -> Trigger presence sensor (PIR). \n");
     printf("    'q'    -> Exit program. \n");
-    printf("-----------------------------------------------------------------------------------\n");
+    printf("-----------------------------------------------------------------------------------\n\n");
 
-    //Frame index
-    int frame = 0;
+    //Initialize events
+    reactor_events_init();
 
+    //Start handling them
     while (1) {
-        //Read pressed keys
-        processKey();
-
-        /* 
-        CYCLIC EXECUTIVE
-            CODE_FSM   -> T = 50ms
-            ALARM_FSM  -> T = 250ms
-            SWITCH_FSM -> T = 500ms
-        */
-        switch (frame) {
-			case 0:
-				fsm_fire (code_fsm);
-                fsm_fire (alarm_fsm);
-                fsm_fire (switch_fsm);
-				break;
-			case 1:
-				fsm_fire (code_fsm);
-				break;
-			case 2:
-				fsm_fire (code_fsm);
-				break;
-			case 3:
-				fsm_fire (code_fsm);
-				break;
-            case 4:
-				fsm_fire (code_fsm);
-				break;
-			case 5:
-				fsm_fire (code_fsm);
-                fsm_fire (alarm_fsm);
-                break;
-			case 6:
-				fsm_fire (code_fsm);
-				break;
-            case 7:
-				fsm_fire (code_fsm);
-				break;
-			case 8:
-				fsm_fire (code_fsm);
-				break;
-			case 9:
-				fsm_fire (code_fsm);
-				break;
-		}
-
-        //Delay next execution
-        timespec_add(&next,&next,&T);
-        delay_until (&next);
-
-        //Increment frame index
-        frame = (frame+1)%10;
+        reactor_handle_events ();
     }
+
 }
