@@ -46,7 +46,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
 * **code.pml :** modelo en Promela del código (con una abstracción de la FSM de la alarma que solo desactiva la señal "alarm_code" cuando se activa), para verificar sus propiedades basta con ejecutar el comando "make code" dentro del directorio "spin".
 
-    -IMAGEN FSM-
+    ![alt text](https://github.com/alejp1998/isel2020/blob/master/code_fsm.png "CODE FSM MODEL")
 
     **ESPECIFICACION LTL**: 
 
@@ -76,7 +76,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
 * **alarm.pml :** modelo en Promela de la alarma (con una abstracción de la FSM del código que solo activa la señal "alarm_code" de forma no determinista), para verificar sus propiedades basta con ejecutar el comando "make alarm" dentro del directorio "spin".
 
-    -IMAGEN FSM-
+    ![alt text](https://github.com/alejp1998/isel2020/blob/master/alarm_fsm.png "ALARM FSM MODEL")
 
     **ESPECIFICACION LTL**: 
 
