@@ -111,6 +111,7 @@ void examine_code (fsm_t* this) {
     int correct = 1;
     for(int i=0;i<CODE_LENGTH;i++){
         correct &= (current_code[i] == correct_code[i]);
+        current_code[i] = 0;
         //printf("'%d' vs '%d' : %d\n",current_code[i],correct_code[i],correct);
     }
 

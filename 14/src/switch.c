@@ -70,5 +70,5 @@ void update_switch_timer(){
     //Trigger function
     timer_switch_isr();
   }
-  printf("%d",ticks);
+  //printf("%d",ticks);
 }

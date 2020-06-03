@@ -1,0 +1,33 @@
+never digit_processed_after_count_limit_or_timeout {    /* !([] ((! (((T) || ((count>=4))) && ((code_st==1)))) || (<> ((code_st==2))))) */
+T0_init:
+	do
+	:: (! ((! (((T) || ((count>=4))) && ((code_st==1))))) && ! (((code_st==2)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((code_st==2)))) -> goto accept_S4
+	od;
+}
+never three_digits_code_entered_leads_to_idle {    /* !([] ((! (((index+1)>3))) || (<> ((code_st==0))))) */
+T0_init:
+	do
+	:: (! ((! (((index+1)>3)))) && ! (((code_st==0)))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! (((code_st==0)))) -> goto accept_S4
+	od;
+}
+never correct_code_activates_alarm_code_signal {    /* !([] ((! ((((current_code[0]==correct_code[0])) && ((current_code[1]==correct_code[1]))) && ((current_code[2]==correct_code[2])))) || (<> (alarm_code)))) */
+T0_init:
+	do
+	:: (! ((! ((((current_code[0]==correct_code[0])) && ((current_code[1]==correct_code[1]))) && ((current_code[2]==correct_code[2]))))) && ! ((alarm_code))) -> goto accept_S4
+	:: (1) -> goto T0_init
+	od;
+accept_S4:
+	do
+	:: (! ((alarm_code))) -> goto accept_S4
+	od;
+}
