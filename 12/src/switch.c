@@ -11,6 +11,7 @@ fsm_trans_t switch_def[] = {
 };
   
 
+static int ticks = 0;
 static int button = 0;
 static int timer_ended = 0;
 
@@ -51,7 +52,7 @@ void turn_on_light (fsm_t* this) {
 
   printf("LIGHT ON! \n");
 
-  tmr_startms(switch_timer,SWITCH_TMR_PERIOD);
+  start_switch_timer();
 
   digitalWrite (GPIO_LIGHT, 1); 
 }
@@ -62,4 +63,23 @@ void turn_off_light (fsm_t* this) {
   printf("LIGHT OFF! \n");
 
   digitalWrite (GPIO_LIGHT, 0); 
+}
+
+
+//TIMER UPDATE
+void start_switch_timer(){
+  ticks = 0;
+}
+
+void update_switch_timer(){
+  if ((ticks > -1) & (ticks < SWITCH_TMR_TICKS)){
+    //Increase ticks
+    ticks++;
+  } else if (ticks >= SWITCH_TMR_TICKS) {
+    //Set ticks to -1
+    ticks = -1;
+    //Trigger function
+    timer_switch_isr();
+  }
+  //printf("%d",ticks);
 }

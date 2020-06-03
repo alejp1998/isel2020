@@ -55,13 +55,7 @@ int main () {
     //Clock registers
 	struct timespec next;
 	clock_gettime(CLOCK_REALTIME, &next);
-	struct timespec T = {0, 0.050*1000000000};
-
-    //Initialize timers
-    tmr_t* tmr1 = tmr_new(timer_code_isr);
-    code_timer = tmr1;
-    tmr_t* tmr2 = tmr_new(timer_switch_isr);
-    switch_timer = tmr2;
+	struct timespec T = {0, 0.050*1000000000}; //T = 50ms (Hs) 
 
     //Initialze input and output pins
     //initializePins()
@@ -90,9 +84,12 @@ int main () {
     while (1) {
         //Read pressed keys
         processKey();
-
+        //Update timers
+        update_code_timer();
+        update_switch_timer();
+        
         /* 
-        CYCLIC EXECUTIVE
+        CYCLIC EXECUTIVE (H = 500ms)
             CODE_FSM   -> T = 50ms
             ALARM_FSM  -> T = 250ms
             SWITCH_FSM -> T = 500ms

@@ -4,7 +4,7 @@
 
 //FSM DEFINITION
 fsm_trans_t switch_def[] = {
-    { OFF,   check_pressed_button, ON, turn_on_light },
+    { OFF, check_pressed_button, ON, turn_on_light },
     { ON, check_pressed_button, ON, turn_on_light },
     { ON, check_switch_timer_ended, OFF, turn_off_light },
     {-1, NULL, -1, NULL },
