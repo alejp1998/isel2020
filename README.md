@@ -23,7 +23,77 @@ Como el 12 pero implementado con un Reactor.
 Contiene los modelos en promela y especificaciones correspondientes a las tres máquinas de estados de los ejercicios 12, 13 y 14; verificando también que la interacción entre "alarm" y "code" es correcta:
 
 * **switch.pml :** modelo en Promela del interruptor, para verificar sus propiedades basta con ejecutar el comando "make switch" dentro del directorio "spin".
+    
+    -IMAGEN FSM-
+
+    **ESPECIFICACION LTL**: 
+
+    * La luz se enciende despúes de pulsar un botón: 
+    
+    ```promela
+    ltl button_is_followed_by_light {
+        []((button1 || button2) -> <>light);
+    }
+    ```
+
+    * La luz está encendida hasta que eventualmente salta el timer y se apaga: 
+
+    ```c
+    ltl light_on_until_timer {
+        [](light -> <>(T -> <> !light);
+    }
+    ```
 
 * **code.pml :** modelo en Promela del código (con una abstracción de la FSM de la alarma que solo desactiva la señal "alarm_code" cuando se activa), para verificar sus propiedades basta con ejecutar el comando "make code" dentro del directorio "spin".
 
+    -IMAGEN FSM-
+
+    **ESPECIFICACION LTL**: 
+
+    * Se almacena en el buffer un dígito después de salte el temporizador o haya un timeout: 
+    
+    ```c
+    ltl digit_processed_after_count_limit_or_timeout {
+        []( ((T || (count >= COUNT_LIMIT)) && (code_st == COUNT)) -> <>(code_st == BUFFER_DIGIT));
+    }
+    ```
+
+    * Cuando introducimos tres dígitos del código volvemos al estado IDLE: 
+
+    ```c
+    ltl three_digits_code_entered_leads_to_idle {
+        [](((index+1) > CODE_LENGTH) -> <>(code_st == IDLE));
+    }
+    ```
+
+    * Si introducimos el código correctamente activamos la señal "alarm_code": 
+
+    ```c
+    ltl correct_code_activates_alarm_code_signal {
+        [](((current_code[0]==correct_code[0]) && (current_code[1]==correct_code[1]) && (current_code[2]==correct_code[2])) -> <>alarm_code);
+    }
+    ```
+
 * **alarm.pml :** modelo en Promela de la alarma (con una abstracción de la FSM del código que solo activa la señal "alarm_code" de forma no determinista), para verificar sus propiedades basta con ejecutar el comando "make alarm" dentro del directorio "spin".
+
+    -IMAGEN FSM-
+
+    **ESPECIFICACION LTL**: 
+
+    * La alarma se desactiva al introducir el código correctamente: 
+    
+    ```c
+    ltl alarm_deactivation_after_code_entered {
+        []((((alarm_st==TRIGGERED) || (alarm_st==ACTIVE)) && alarm_code) -> <>((alarm_st==INACTIVE)) && !led && !buzzer);
+    }
+    ```
+
+    * La alarma se dispara eventualmente al detectar presencia si está activa: 
+
+    ```c
+    ltl alarm_triggered_after_pir_if_active {
+        [](((alarm_st==ACTIVE) && pir_sensor) -> <>((alarm_st==TRIGGERED) && led && buzzer));
+    }
+    ```
+
+
