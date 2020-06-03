@@ -24,13 +24,13 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
 * **switch.pml :** modelo en Promela del interruptor, para verificar sus propiedades basta con ejecutar el comando "make switch" dentro del directorio "spin".
     
-    -IMAGEN FSM-
+    ![alt text](https://github.com/alejp1998/isel2020/blob/master/switch_fsm.png "SWITCH FSM MODEL")
 
     **ESPECIFICACION LTL**: 
 
     * La luz se enciende despúes de pulsar un botón: 
     
-    ```promela
+    ```python
     ltl button_is_followed_by_light {
         []((button1 || button2) -> <>light);
     }
@@ -38,7 +38,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
     * La luz está encendida hasta que eventualmente salta el timer y se apaga: 
 
-    ```c
+    ```python
     ltl light_on_until_timer {
         [](light -> <>(T -> <> !light);
     }
@@ -52,7 +52,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
     * Se almacena en el buffer un dígito después de salte el temporizador o haya un timeout: 
     
-    ```c
+    ```python
     ltl digit_processed_after_count_limit_or_timeout {
         []( ((T || (count >= COUNT_LIMIT)) && (code_st == COUNT)) -> <>(code_st == BUFFER_DIGIT));
     }
@@ -60,7 +60,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
     * Cuando introducimos tres dígitos del código volvemos al estado IDLE: 
 
-    ```c
+    ```python
     ltl three_digits_code_entered_leads_to_idle {
         [](((index+1) > CODE_LENGTH) -> <>(code_st == IDLE));
     }
@@ -68,7 +68,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
     * Si introducimos el código correctamente activamos la señal "alarm_code": 
 
-    ```c
+    ```python
     ltl correct_code_activates_alarm_code_signal {
         [](((current_code[0]==correct_code[0]) && (current_code[1]==correct_code[1]) && (current_code[2]==correct_code[2])) -> <>alarm_code);
     }
@@ -82,7 +82,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
     * La alarma se desactiva al introducir el código correctamente: 
     
-    ```c
+    ```python
     ltl alarm_deactivation_after_code_entered {
         []((((alarm_st==TRIGGERED) || (alarm_st==ACTIVE)) && alarm_code) -> <>((alarm_st==INACTIVE)) && !led && !buzzer);
     }
@@ -90,7 +90,7 @@ Contiene los modelos en promela y especificaciones correspondientes a las tres m
 
     * La alarma se dispara eventualmente al detectar presencia si está activa: 
 
-    ```c
+    ```python
     ltl alarm_triggered_after_pir_if_active {
         [](((alarm_st==ACTIVE) && pir_sensor) -> <>((alarm_st==TRIGGERED) && led && buzzer));
     }
