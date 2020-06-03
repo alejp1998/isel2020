@@ -108,7 +108,7 @@ active proctype environment () {
 //SPECIFICATIONS
 //Alarm code
 ltl alarm_deactivation_after_code_entered {
-	[]( (((alarm_st==TRIGGERED) || (alarm_st==ACTIVE)) && alarm_code) -> <>((alarm_st==INACTIVE)) && !led && !buzzer);
+	[]((((alarm_st==TRIGGERED) || (alarm_st==ACTIVE)) && alarm_code) -> <>((alarm_st==INACTIVE)) && !led && !buzzer);
 }
 ltl alarm_triggered_after_pir_if_active {
 	[](((alarm_st==ACTIVE) && pir_sensor) -> <>((alarm_st==TRIGGERED) && led && buzzer));

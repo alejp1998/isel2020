@@ -11,4 +11,4 @@ alarm:
 
 
 clean:
-	$(RM) *.o *~ pan* *.trail
+	$(RM) *.o *~ pan* *.trail *.tmp
