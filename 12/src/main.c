@@ -4,37 +4,43 @@
 #include "pthread.h"
 
 #include "timer.h"
-#include "kbhit.h"
+#include "ttyraw.h"
+#include "termios.h"
 
 #include "switch.h"
 #include "alarm.h"
 #include "code.h"
 
 //CHECK PRESSED KEYS
-void processKey()
+int key_pressed (void)
 {
-    char pressedKey;
-    if(kbhit()){
-        pressedKey = kbread();
-        switch(pressedKey){
-            case 'b' :
-                button_isr();
-                break;
-            case 'v' :
-                button_isr();
-                break;
-            case 'k' :
-                key_isr();
-                break;
-            case 'p' :
-                pir_isr();
-                break;
-            case 'q' :
-                exit(-1);
-                break;
-            default : 
-                break;
-        }
+  struct timeval timeout = { 0, 0 };
+  fd_set rd_fdset;
+  FD_ZERO(&rd_fdset);
+  FD_SET(0, &rd_fdset);
+  return select(1, &rd_fdset, NULL, NULL, &timeout) > 0;
+}
+
+void key_process (int ch)
+{
+    switch(ch){
+        case 'b' :
+            button_isr();
+            break;
+        case 'v' :
+            button_isr();
+            break;
+        case 'k' :
+            key_isr();
+            break;
+        case 'p' :
+            pir_isr();
+            break;
+        case 'q' :
+            exit(-1);
+            break;
+        default : 
+            break;
     }
 }
 
@@ -64,9 +70,9 @@ int main () {
     * Finite States Machine
     * { OriginState, Trigger, DestinationState, Actions }
     */
-    fsm_t* switch_fsm = fsm_new (switch_def);
-    fsm_t* alarm_fsm = fsm_new (alarm);
-    fsm_t* code_fsm = fsm_new (code);
+    fsm_t* switch_fsm = fsm_new_switch();
+    fsm_t* alarm_fsm = fsm_new_alarm();
+    fsm_t* code_fsm = fsm_new_code();
 
     //WELCOME MESSAGE
     printf("\n---------------------------------------------------------------------------------\n");
@@ -83,7 +89,9 @@ int main () {
 
     while (1) {
         //Read pressed keys
-        processKey();
+        if (key_pressed()) {
+          key_process(getchar());
+        }
         //Update timers
         update_code_timer();
         update_switch_timer();

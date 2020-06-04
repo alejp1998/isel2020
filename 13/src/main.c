@@ -1,22 +1,21 @@
 
-#include "time.h"
 #include "stdio.h"
 
 #include "termios.h"
 #include "sys/select.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+#include "sys/time.h"
+#include "task.h"
 
+#include "timer.h"
 #include "kbhit.h"
 
 #include "switch.h"
 #include "alarm.h"
 #include "code.h"
 
-//FSM Declarations
-fsm_t* switch_fsm;
 fsm_t* alarm_fsm;
 fsm_t* code_fsm;
+fsm_t* switch_fsm;
 
 //CHECK PRESSED KEYS
 void processKey()
@@ -47,72 +46,72 @@ void processKey()
 }
 
 
-//FREERTOS 
+//THREADS
 //Process key task and update timers state
-static void processKey_task (void* ignore) {
-    portTickType period =  50 /portTICK_RATE_MS;
+static void* processKey_task (void* arg) {
+    struct timeval *period = task_get_period (pthread_self());
+    struct timeval next;
 
-    portTickType last = xTaskGetTickCount();
-
-    start_code_timer();
-    start_switch_timer();
+    gettimeofday (&next, NULL);
 
     while (1) {
+        timeval_add (&next, &next, period);
+        delay_until (&next);
+
         processKey();
 
         update_code_timer();
         update_switch_timer();
-
-        vTaskDelayUntil (&last, period);
     }
 }
 
 //Alarm fsm task
-static void alarm_task (void* ignore) {
-    portTickType period =  250 /portTICK_RATE_MS;
+static void* alarm_task (void* arg) {
+    alarm_fsm = fsm_new_alarm();
 
-    portTickType last = xTaskGetTickCount();
+    struct timeval *period = task_get_period (pthread_self());
+    struct timeval next;
 
+    gettimeofday (&next, NULL);
     while (1) {
+        timeval_add (&next, &next, period);
+        delay_until (&next);
+        
         fsm_fire(alarm_fsm);
-        vTaskDelayUntil (&last, period);
     }
 }
 
 //Code fsm task
-static void code_task (void* ignore) {
-    portTickType period =  50 /portTICK_RATE_MS;
+static void* code_task (void* arg) {
+    code_fsm = fsm_new_code();
 
-    portTickType last = xTaskGetTickCount();
+    struct timeval *period = task_get_period (pthread_self());
+    struct timeval next;
 
+    gettimeofday (&next, NULL);
     while (1) {
+        timeval_add (&next, &next, period);
+        delay_until (&next);
+        
         fsm_fire(code_fsm);
-        vTaskDelayUntil (&last, period);
     }
 }
 
 //Switch fsm task
-static void switch_task (void* ignore) {
-    portTickType period =  500 /portTICK_RATE_MS;
+static void* switch_task (void* arg) {
+    switch_fsm = fsm_new_switch();
 
-    portTickType last = xTaskGetTickCount();
+    struct timeval *period = task_get_period (pthread_self());
+    struct timeval next;
 
+    gettimeofday (&next, NULL);
     while (1) {
+        timeval_add (&next, &next, period);
+        delay_until (&next);
+        
         fsm_fire(switch_fsm);
-        vTaskDelayUntil (&last, period);
     }
 }
-
-void user_init (void) {
-    xTaskHandle task_processKey, task_alarm, task_code, task_switch;
-    xTaskCreate (processKey_task, (const signed char*) "processKey", 2048, NULL, 4, &task_processKey);
-    xTaskCreate (code_task, (const signed char*) "code", 2048, NULL, 3, &task_code);
-    xTaskCreate (alarm_task, (const signed char*) "alarm", 2048, NULL, 2, &task_alarm);
-    xTaskCreate (switch_task, (const signed char*) "switch", 2048, NULL, 1, &task_switch);
-}
-
-void vApplicationIdleHook (void) {}
-void vMainQueueSendPassed (void) {}
 
 
 /*
@@ -133,14 +132,6 @@ int main () {
     //Initialze input and output pins
     //initializePins()
 
-    /*
-    * Finite States Machine
-    * { OriginState, Trigger, DestinationState, Actions }
-    */
-    fsm_t* switch_fsm = fsm_new (switch_def);
-    fsm_t* alarm_fsm = fsm_new (alarm);
-    fsm_t* code_fsm = fsm_new (code);
-
     //WELCOME MESSAGE
     printf("\n---------------------------------------------------------------------------------\n");
     printf("WELCOME!!! \n\n");
@@ -151,10 +142,21 @@ int main () {
     printf("    'q'    -> Exit program. \n");
     printf("-----------------------------------------------------------------------------------\n\n");
 
-    //Initialize user
-    user_init();
+    //Initialize threads
+    pthread_t processKey_tid, alarm_tid, code_tid, switch_tid;
 
-    //Start tasks scheduling
-    vTaskStartScheduler();
+    //mutex_init (&m_temp, 2);
 
+    //Create tasks task_new (const char* name, void *(*f)(void *),int period_ms, int deadline_ms, int prio, int stacksize)
+    processKey_tid = task_new ("processKey", processKey_task, 50, 50, 4, 2048);
+    code_tid = task_new ("code", code_task, 50, 50, 3, 2048);
+    alarm_tid = task_new ("alarm", alarm_task, 250, 250, 2, 2048);
+    switch_tid = task_new ("switch", switch_task, 500, 500, 1, 2048);
+
+    pthread_join (processKey_tid, NULL);
+    pthread_join (code_tid, NULL);
+    pthread_join (alarm_tid, NULL);
+    pthread_join (switch_tid, NULL);
+
+    return 0;
 }

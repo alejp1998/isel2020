@@ -56,6 +56,7 @@ void processKey() {
 static void processKey_task (struct event_handler_t* this) {
     processKey();
 
+    //Update timers
     update_code_timer();
     update_switch_timer();
 
@@ -80,25 +81,6 @@ static void switch_task (struct event_handler_t* this) {
     timeval_add (&this->next_activation, &this->next_activation, &switch_period);
 }
 
-//Initialize events handler
-void reactor_events_init () {
-    EventHandler task_processKey, task_alarm, task_code, task_switch;
-
-    reactor_init();
-
-    event_handler_init (&task_processKey, 4, processKey_task);
-    reactor_add_handler (&task_processKey);
-
-    event_handler_init (&task_code, 3, code_task);
-    reactor_add_handler (&task_code);
-
-    event_handler_init (&task_alarm, 2, alarm_task);
-    reactor_add_handler (&task_alarm);
-
-    event_handler_init (&task_switch, 1, switch_task);
-    reactor_add_handler (&task_switch);
-}
-
 
 /*
 void initializePins ()
@@ -118,13 +100,18 @@ int main () {
     //Initialze input and output pins
     //initializePins()
 
+    //Initialize events
+    EventHandler task_processKey, task_alarm, task_code, task_switch;
+
+    reactor_init();
+
     /*
     * Finite States Machine
     * { OriginState, Trigger, DestinationState, Actions }
     */
-    fsm_t* switch_fsm = fsm_new (switch_def);
-    fsm_t* alarm_fsm = fsm_new (alarm);
-    fsm_t* code_fsm = fsm_new (alarm);
+    switch_fsm = fsm_new_switch();
+    alarm_fsm = fsm_new_alarm();
+    code_fsm = fsm_new_code();
 
     //WELCOME MESSAGE
     printf("\n-----------------------------------------------------------------------------------\n");
@@ -136,8 +123,18 @@ int main () {
     printf("    'q'    -> Exit program. \n");
     printf("-----------------------------------------------------------------------------------\n\n");
 
-    //Initialize events
-    reactor_events_init();
+    //Initialize and add tasks
+    event_handler_init (&task_processKey, 4, processKey_task);
+    reactor_add_handler (&task_processKey);
+
+    event_handler_init (&task_code, 3, code_task);
+    reactor_add_handler (&task_code);
+
+    event_handler_init (&task_alarm, 2, alarm_task);
+    reactor_add_handler (&task_alarm);
+
+    event_handler_init (&task_switch, 1, switch_task);
+    reactor_add_handler (&task_switch);
 
     //Start handling them
     while (1) {

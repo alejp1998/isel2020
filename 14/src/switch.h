@@ -12,7 +12,9 @@
 #define GPIO_BUTTON2	3
 #define GPIO_LIGHT	  4
 
-#define SWITCH_TMR_TICKS 200
+#define DEBOUNCE_TIME 200
+
+#define SWITCH_TMR_TICKS 10000/50 //(Updated every Hs=50ms)
 
 enum fsm_state {
   ON,
@@ -20,7 +22,7 @@ enum fsm_state {
 };
 
 //TIMER UPDATE
-void start_switch_timer();
+static void start_switch_timer();
 void update_switch_timer();
 
 //INTERRUPTIONS ROUTINES
@@ -28,14 +30,14 @@ void button_isr (void);
 void timer_switch_isr (void);
 
 //STATE CHECKING FUNCTIONS
-int check_pressed_button (fsm_t* this);
-int check_switch_timer_ended(fsm_t* this);
+static int check_pressed_button (fsm_t* this);
+static int check_switch_timer_ended(fsm_t* this);
 
 //OUTPUT FUNCTIONS
-void turn_on_light (fsm_t* this);
-void turn_off_light (fsm_t* this);
+static void turn_on_light (fsm_t* this);
+static void turn_off_light (fsm_t* this);
 
-//FSM DEFINITION
-fsm_trans_t switch_def[];
+//FSM CREATION
+fsm_t* fsm_new_switch (void);
 
 #endif

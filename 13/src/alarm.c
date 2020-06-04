@@ -1,14 +1,18 @@
 
 #include "alarm.h"
 
-//FSM DEFINITION
-fsm_trans_t alarm[] = {
+//FSM CREATION
+fsm_t* fsm_new_alarm (void) {
+	static fsm_trans_t tt[] = {
     { INACTIVE,  check_alarm_code, ACTIVE, activate_alarm },
     { ACTIVE, check_alarm_code, INACTIVE, deactivate_alarm },
     { ACTIVE, check_presence, TRIGGERED, trigger_alarm },
     { TRIGGERED, check_alarm_code, INACTIVE, deactivate_alarm },
     {-1, NULL, -1, NULL },
-};
+  };
+	return fsm_new(tt);
+}
+
 
 
 static int alarm_code = 0;
@@ -35,23 +39,24 @@ void alarm_code_isr (void) {
 
 
 //STATE CHECKING FUNCTIONS
-int check_presence (fsm_t* this) { 
+static int check_presence (fsm_t* this) { 
   return pir_sensor; 
 }
 
-int check_alarm_code (fsm_t* this) { 
+static int check_alarm_code (fsm_t* this) { 
   return alarm_code; 
 }
 
 
 //OUTPUT FUNCTIONS
-void activate_alarm (fsm_t* this) {
+static void activate_alarm (fsm_t* this) {
   pir_sensor = 0;
   alarm_code = 0;
 
   printf("ALARM ACTIVATED \n");
 }
-void deactivate_alarm (fsm_t* this) { 
+
+static void deactivate_alarm (fsm_t* this) { 
   pir_sensor = 0;
   alarm_code = 0;
 
@@ -61,6 +66,7 @@ void deactivate_alarm (fsm_t* this) {
   digitalWrite (GPIO_LIGHT, 0); 
   digitalWrite (GPIO_BUZZER, 0); 
 }
+
 void trigger_alarm (fsm_t* this) { 
   pir_sensor = 0;
   alarm_code = 0;

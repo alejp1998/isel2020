@@ -1,7 +1,8 @@
 #include "code.h"
 
-//FSM DEFINITION
-fsm_trans_t code[] = {
+//FSM CREATION
+fsm_t* fsm_new_code (void) {
+	static fsm_trans_t tt[] = {
     { IDLE,  check_pressed_key, COUNT, increase_count },
     { COUNT, check_pressed_key, COUNT, increase_count },
     { COUNT, check_count_limit, BUFFER_DIGIT, process_digit },
@@ -9,10 +10,12 @@ fsm_trans_t code[] = {
     { BUFFER_DIGIT, check_pressed_key, COUNT, increase_count },
     { BUFFER_DIGIT, check_code_ended, IDLE, examine_code },
     {-1, NULL, -1, NULL },
-};
+  };
+	return fsm_new(tt);
+}
 
 
-const int correct_code[CODE_LENGTH] = {1, 2, 3};
+static const int correct_code[CODE_LENGTH] = {1, 2, 3};
 
 static int ticks = 0;
 static int key = 0;
@@ -21,10 +24,20 @@ static int count = 0;
 static int index = 0;
 static int current_code[CODE_LENGTH] = {0,0,0};
 
+static int debounceTime = DEBOUNCE_TIME;
 
 //INTERRUPTIONS ROUTINES
 void key_isr (void) { 
+
+  //Debouncing procedure
+  if (millis() < debounceTime){
+    debounceTime = millis() + DEBOUNCE_TIME;
+    return;
+  }
+
   key = 1;
+
+  debounceTime = millis() + DEBOUNCE_TIME;
 }
 
 void timer_code_isr (void) { 
@@ -33,30 +46,29 @@ void timer_code_isr (void) {
 
 
 //STATE CHECKING FUNCTIONS
-int check_pressed_key (fsm_t* this) { 
+static int check_pressed_key (fsm_t* this) { 
   return key & (index < CODE_LENGTH); 
 }
 
-int check_count_limit (fsm_t* this) { 
+static int check_count_limit (fsm_t* this) { 
   return COUNT_LIMIT <= count; 
 }
 
-int check_code_timer_ended (fsm_t* this) { 
+static int check_code_timer_ended (fsm_t* this) { 
   return timer_ended; 
 }
 
-int check_code_ended (fsm_t* this) { 
+static int check_code_ended (fsm_t* this) { 
   return index >= CODE_LENGTH; 
 }
 
-int check_code_not_ended (fsm_t* this) { 
+static int check_code_not_ended (fsm_t* this) { 
   return index < CODE_LENGTH; 
 }
 
 
 //OUTPUT FUNCTIONS
-void increase_count (fsm_t* this) {
-
+static void increase_count (fsm_t* this) {
     key = 0;
     timer_ended = 0;
 
@@ -66,7 +78,7 @@ void increase_count (fsm_t* this) {
     printf("COUNT INCREASED TO '%d' \n",count);
 }
 
-void process_digit (fsm_t* this) { 
+static void process_digit (fsm_t* this) { 
     key = 0;
     timer_ended = 0;
 
@@ -94,7 +106,7 @@ void process_digit (fsm_t* this) {
     }
 }
 
-void examine_code (fsm_t* this) { 
+static void examine_code (fsm_t* this) { 
     key = 0;
     timer_ended = 0;
 
@@ -115,9 +127,8 @@ void examine_code (fsm_t* this) {
     index = 0;
 }
 
-
 //TIMER UPDATE
-void start_code_timer(){
+static void start_code_timer(){
   ticks = 0;
 }
 
