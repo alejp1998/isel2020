@@ -6,7 +6,7 @@
 void 
 digitalWrite(int gpio, int value)
 {
-  printf ("\nGPIO%d <- %d\n", gpio, value);
+  printf ("\r\nGPIO%d <- %d\n", gpio, value);
 }
 
 unsigned

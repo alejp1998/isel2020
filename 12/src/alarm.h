@@ -25,15 +25,6 @@ enum alarm_fsm_states {
 void pir_isr         (void);
 void alarm_state_isr (void);
 
-//STATE CHECKING
-static int check_presence    (fsm_t* this);
-static int check_alarm_code (fsm_t* this);
-
-//OUTPUT FUNCTIONS
-static void activate_alarm    (fsm_t* this);
-static void deactivate_alarm  (fsm_t* this);
-static void trigger_alarm     (fsm_t* this);
-
 //FSM DEFINITION
 fsm_t* fsm_new_alarm (void);
 

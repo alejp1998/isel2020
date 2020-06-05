@@ -4,63 +4,35 @@
 
 #include "reactor.h"
 
-#include "kbhit.h"
-
+#include "kbd.h"
 #include "switch.h"
 #include "alarm.h"
 #include "code.h"
 
 //FSM Declarations
-fsm_t* switch_fsm;
+static fsm_t* kbd_fsm;
+static const struct timeval kbd_period = {0, 50*1000000};
+
+static fsm_t* switch_fsm;
 static const struct timeval switch_period = {0, 500*1000000};
 
-fsm_t* alarm_fsm;
+static fsm_t* alarm_fsm;
 static const struct timeval alarm_period = {0, 250*1000000};
 
-fsm_t* code_fsm;
+static fsm_t* code_fsm;
 static const struct timeval code_period = {0, 50*1000000};
-
-
-
-//CHECK PRESSED KEYS
-static const struct timeval key_period = {0, 50*1000000};
-void processKey() {
-    char pressedKey;
-    if(kbhit()){
-        pressedKey = kbread();
-        switch(pressedKey){
-            case 'b' :
-                button_isr();
-                break;
-            case 'v' :
-                button_isr();
-                break;
-            case 'k' :
-                key_isr();
-                break;
-            case 'p' :
-                pir_isr();
-                break;
-            case 'q' :
-                exit(-1);
-                break;
-            default : 
-                break;
-        }
-    }
-}
 
 
 //REACTOR EVENTS
 //Process key task and update timers state
-static void processKey_task (struct event_handler_t* this) {
-    processKey();
+static void kbd_task (struct event_handler_t* this) {
+    fsm_fire(kbd_fsm);
 
     //Update timers
     update_code_timer();
     update_switch_timer();
 
-    timeval_add (&this->next_activation, &this->next_activation, &key_period);
+    timeval_add (&this->next_activation, &this->next_activation, &kbd_period);
 }
 
 //Alarm fsm task
@@ -101,31 +73,31 @@ int main () {
     //initializePins()
 
     //Initialize events
-    EventHandler task_processKey, task_alarm, task_code, task_switch;
-
+    EventHandler task_kbd, task_alarm, task_code, task_switch;
     reactor_init();
 
     /*
     * Finite States Machine
     * { OriginState, Trigger, DestinationState, Actions }
     */
+    kbd_fsm = fsm_new_kbd();
     switch_fsm = fsm_new_switch();
     alarm_fsm = fsm_new_alarm();
     code_fsm = fsm_new_code();
 
     //WELCOME MESSAGE
-    printf("\n-----------------------------------------------------------------------------------\n");
-    printf("WELCOME!!! \n\n");
-    printf("Controls: \n");
-    printf("'v' or 'b' -> Turn light on (turned off automatically). \n");
-    printf("    'k'    -> Enter digit of alarm code (wait 1sec to enter next digit). \n");
-    printf("    'p'    -> Trigger presence sensor (PIR). \n");
-    printf("    'q'    -> Exit program. \n");
-    printf("-----------------------------------------------------------------------------------\n\n");
+    printf("\r\n-----------------------------------------------------------------------------------\n");
+    printf("\rWELCOME!!! \n\n");
+    printf("\rControls: \n");
+    printf("\r'v' or 'b' -> Turn light on (turned off automatically). \n");
+    printf("\r    'k'    -> Enter digit of alarm code (wait 1sec to enter next digit). \n");
+    printf("\r    'p'    -> Trigger presence sensor (PIR). \n");
+    printf("\r    'q'    -> Exit program. \n");
+    printf("\r-----------------------------------------------------------------------------------\n\n");
 
     //Initialize and add tasks
-    event_handler_init (&task_processKey, 4, processKey_task);
-    reactor_add_handler (&task_processKey);
+    event_handler_init (&task_kbd, 4, kbd_task);
+    reactor_add_handler (&task_kbd);
 
     event_handler_init (&task_code, 3, code_task);
     reactor_add_handler (&task_code);

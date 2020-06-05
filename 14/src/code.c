@@ -1,20 +1,5 @@
 #include "code.h"
 
-//FSM CREATION
-fsm_t* fsm_new_code (void) {
-	static fsm_trans_t tt[] = {
-    { IDLE,  check_pressed_key, COUNT, increase_count },
-    { COUNT, check_pressed_key, COUNT, increase_count },
-    { COUNT, check_count_limit, BUFFER_DIGIT, process_digit },
-    { COUNT, check_code_timer_ended, BUFFER_DIGIT, process_digit },
-    { BUFFER_DIGIT, check_pressed_key, COUNT, increase_count },
-    { BUFFER_DIGIT, check_code_ended, IDLE, examine_code },
-    {-1, NULL, -1, NULL },
-  };
-	return fsm_new(tt);
-}
-
-
 static const int correct_code[CODE_LENGTH] = {1, 2, 3};
 
 static int ticks = 0;
@@ -42,6 +27,25 @@ void key_isr (void) {
 
 void timer_code_isr (void) { 
     timer_ended = 1;
+}
+
+
+//TIMER UPDATE
+static void start_code_timer(){
+  ticks = 0;
+}
+
+void update_code_timer(){
+  if ((ticks > -1) & (ticks < CODE_TMR_TICKS)){
+    //Increase ticks
+    ticks++;
+  } else if (ticks >= CODE_TMR_TICKS) {
+    //Set ticks to -1
+    ticks = -1;
+    //Trigger function
+    timer_code_isr();
+  }
+  //printf("%d",ticks);
 }
 
 
@@ -75,7 +79,7 @@ static void increase_count (fsm_t* this) {
     count++;
     start_code_timer();
 
-    printf("COUNT INCREASED TO '%d' \n",count);
+    printf("\rCOUNT INCREASED TO '%d' \n",count);
 }
 
 static void process_digit (fsm_t* this) { 
@@ -90,11 +94,11 @@ static void process_digit (fsm_t* this) {
 
     
     if (index == 0) {
-        printf("DIGIT '%d' ENTERED: CURRENT CODE = [%d,X,X]\n",index+1,current_code[0]);
+        printf("\rDIGIT '%d' ENTERED: CURRENT CODE = [%d,X,X]\n",index+1,current_code[0]);
     } else if (index == 1) {
-        printf("DIGIT '%d' ENTERED: CURRENT CODE = [%d,%d,X]\n",index+1,current_code[0],current_code[1]);
+        printf("\rDIGIT '%d' ENTERED: CURRENT CODE = [%d,%d,X]\n",index+1,current_code[0],current_code[1]);
     } else if (index == 2) {
-        printf("DIGIT '%d' ENTERED: CURRENT CODE = [%d,%d,%d]\n",index+1,current_code[0],current_code[1],current_code[2]);
+        printf("\rDIGIT '%d' ENTERED: CURRENT CODE = [%d,%d,%d]\n",index+1,current_code[0],current_code[1],current_code[2]);
     }
     
 
@@ -102,7 +106,7 @@ static void process_digit (fsm_t* this) {
     index++;
 
     if (index < CODE_LENGTH){
-        printf("ENTER DIGIT '%d' \n",index+1);
+        printf("\rENTER DIGIT '%d' \n",index+1);
     }
 }
 
@@ -118,29 +122,26 @@ static void examine_code (fsm_t* this) {
     }
 
     if(correct){
-        printf("ENTERED CODE IS CORRECT. \n");
+        printf("\rENTERED CODE IS CORRECT. \n");
         alarm_code_isr();
     }else{
-        printf("ENTERED CODE IS INCORRECT. TRY AGAIN. \n");
+        printf("\rENTERED CODE IS INCORRECT. TRY AGAIN. \n");
     }
 
     index = 0;
 }
 
-//TIMER UPDATE
-static void start_code_timer(){
-  ticks = 0;
-}
 
-void update_code_timer(){
-  if ((ticks > -1) & (ticks < CODE_TMR_TICKS)){
-    //Increase ticks
-    ticks++;
-  } else if (ticks >= CODE_TMR_TICKS) {
-    //Set ticks to -1
-    ticks = -1;
-    //Trigger function
-    timer_code_isr();
-  }
-  //printf("%d",ticks);
+//FSM CREATION
+fsm_t* fsm_new_code (void) {
+	static fsm_trans_t tt[] = {
+    { IDLE,  check_pressed_key, COUNT, increase_count },
+    { COUNT, check_pressed_key, COUNT, increase_count },
+    { COUNT, check_count_limit, BUFFER_DIGIT, process_digit },
+    { COUNT, check_code_timer_ended, BUFFER_DIGIT, process_digit },
+    { BUFFER_DIGIT, check_pressed_key, COUNT, increase_count },
+    { BUFFER_DIGIT, check_code_ended, IDLE, examine_code },
+    {-1, NULL, -1, NULL },
+  };
+	return fsm_new(tt);
 }

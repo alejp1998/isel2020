@@ -10,39 +10,7 @@
 #include "switch.h"
 #include "alarm.h"
 #include "code.h"
-
-//CHECK PRESSED KEYS
-int key_pressed (void)
-{
-  struct timeval timeout = { 0, 0 };
-  fd_set rd_fdset;
-  FD_ZERO(&rd_fdset);
-  FD_SET(0, &rd_fdset);
-  return select(1, &rd_fdset, NULL, NULL, &timeout) > 0;
-}
-
-void key_process (int ch)
-{
-    switch(ch){
-        case 'b' :
-            button_isr();
-            break;
-        case 'v' :
-            button_isr();
-            break;
-        case 'k' :
-            key_isr();
-            break;
-        case 'p' :
-            pir_isr();
-            break;
-        case 'q' :
-            exit(-1);
-            break;
-        default : 
-            break;
-    }
-}
+#include "kbd.h"
 
 /*void initializePins ()
 {
@@ -70,70 +38,78 @@ int main () {
     * Finite States Machine
     * { OriginState, Trigger, DestinationState, Actions }
     */
+    fsm_t* kbd_fsm = fsm_new_kbd();
     fsm_t* switch_fsm = fsm_new_switch();
     fsm_t* alarm_fsm = fsm_new_alarm();
     fsm_t* code_fsm = fsm_new_code();
 
     //WELCOME MESSAGE
-    printf("\n---------------------------------------------------------------------------------\n");
-    printf("WELCOME!!! \n\n");
-    printf("Controls: \n");
-    printf("'v' or 'b' -> Turn light on (turned off automatically). \n");
-    printf("    'k'    -> Enter digit of alarm code (wait 1sec to enter next digit). \n");
-    printf("    'p'    -> Trigger presence sensor (PIR). \n");
-    printf("    'q'    -> Exit program. \n");
-    printf("-----------------------------------------------------------------------------------\n\n");
+    printf("\r\n---------------------------------------------------------------------------------\n");
+    printf("\rWELCOME!!! \n\n");
+    printf("\rControls: \n");
+    printf("\r'v' or 'b' -> Turn light on (turned off automatically). \n");
+    printf("\r    'k'    -> Enter digit of alarm code (wait 1sec to enter next digit). \n");
+    printf("\r    'p'    -> Trigger presence sensor (PIR). \n");
+    printf("\r    'q'    -> Exit program. \n");
+    printf("\r-----------------------------------------------------------------------------------\n\n");
 
     //Frame index
     int frame = 0;
 
     while (1) {
-        //Read pressed keys
-        if (key_pressed()) {
-          key_process(getchar());
-        }
         //Update timers
         update_code_timer();
         update_switch_timer();
         
         /* 
         CYCLIC EXECUTIVE (H = 500ms)
+            KBD_FSM    -> T = 50ms
             CODE_FSM   -> T = 50ms
             ALARM_FSM  -> T = 250ms
             SWITCH_FSM -> T = 500ms
         */
         switch (frame) {
 			case 0:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
                 fsm_fire (alarm_fsm);
                 fsm_fire (switch_fsm);
 				break;
 			case 1:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
 			case 2:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
 			case 3:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
             case 4:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
 			case 5:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
                 fsm_fire (alarm_fsm);
                 break;
 			case 6:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
             case 7:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
 			case 8:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
 			case 9:
+                fsm_fire (kbd_fsm);
 				fsm_fire (code_fsm);
 				break;
 		}

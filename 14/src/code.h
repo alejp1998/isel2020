@@ -24,24 +24,11 @@ enum code_fsm_state {
 };
 
 //TIMER UPDATE
-static void start_code_timer();
 void update_code_timer();
 
 //INTERRUPTIONS
 void key_isr   (void);
 void timer_code_isr (void);
-
-//STATE CHECKING
-static int check_pressed_key (fsm_t* this);
-static int check_count_limit (fsm_t* this);
-static int check_code_timer_ended (fsm_t* this);
-static int check_code_ended (fsm_t* this);
-static int check_code_not_ended (fsm_t* this);
-
-//OUTPUT FUNCTIONS
-static void increase_count (fsm_t* this);
-static void process_digit  (fsm_t* this);
-static void examine_code   (fsm_t* this);
 
 //FSM CREATION
 fsm_t* fsm_new_code (void);

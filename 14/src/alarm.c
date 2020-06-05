@@ -1,20 +1,6 @@
 
 #include "alarm.h"
 
-//FSM CREATION
-fsm_t* fsm_new_alarm (void) {
-	static fsm_trans_t tt[] = {
-    { INACTIVE,  check_alarm_code, ACTIVE, activate_alarm },
-    { ACTIVE, check_alarm_code, INACTIVE, deactivate_alarm },
-    { ACTIVE, check_presence, TRIGGERED, trigger_alarm },
-    { TRIGGERED, check_alarm_code, INACTIVE, deactivate_alarm },
-    {-1, NULL, -1, NULL },
-  };
-	return fsm_new(tt);
-}
-
-
-
 static int alarm_code = 0;
 static int pir_sensor = 0;
 static int debounceTime = DEBOUNCE_TIME;
@@ -53,14 +39,14 @@ static void activate_alarm (fsm_t* this) {
   pir_sensor = 0;
   alarm_code = 0;
 
-  printf("ALARM ACTIVATED \n");
+  printf("\rALARM ACTIVATED \n");
 }
 
 static void deactivate_alarm (fsm_t* this) { 
   pir_sensor = 0;
   alarm_code = 0;
 
-  printf("ALARM DEACTIVATED \n");
+  printf("\rALARM DEACTIVATED \n");
 
   //Turn light and buzzer off
   digitalWrite (GPIO_LIGHT, 0); 
@@ -71,9 +57,22 @@ void trigger_alarm (fsm_t* this) {
   pir_sensor = 0;
   alarm_code = 0;
 
-  printf("PRESENCE DETECTED: ALARM TRIGGERED!!! \n");
+  printf("\rPRESENCE DETECTED: ALARM TRIGGERED!!! \n");
 
   //Turn light and buzzer on
   digitalWrite (GPIO_LIGHT, 1); 
   digitalWrite (GPIO_BUZZER, 1); 
+}
+
+
+//FSM CREATION
+fsm_t* fsm_new_alarm (void) {
+	static fsm_trans_t tt[] = {
+    { INACTIVE,  check_alarm_code, ACTIVE, activate_alarm },
+    { ACTIVE, check_alarm_code, INACTIVE, deactivate_alarm },
+    { ACTIVE, check_presence, TRIGGERED, trigger_alarm },
+    { TRIGGERED, check_alarm_code, INACTIVE, deactivate_alarm },
+    {-1, NULL, -1, NULL },
+  };
+	return fsm_new(tt);
 }

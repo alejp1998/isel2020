@@ -12,7 +12,7 @@ Implementación mediante un ejecutivo cíclico de las tres FSM (switch, alarm y 
 
 ## Ejercicio 13
 
-Como el 12 pero implementado con FreeRTOS.
+Como el 12 pero implementado con threads.
 
 ## Ejercicio 14
 
