@@ -57,25 +57,20 @@ Por otro lado, el disparo de la alarma al detectar presencia es importante que t
 
 ### Ejecutivo cíclico
 
+Para realizar el ejecutivo cíclico necesitamos obtener el hiperperiódo y el subperiodo. Se pueden obtener como: 
+
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;H=m.c.m{\{}T_{KBD},T_{CODE},T_{ALARM},T_{SWITCH}{\}}=500ms" title="h" />
+
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;H=m.c.d{\{}T_{KBD},T_{CODE},T_{ALARM},T_{SWITCH}{\}}=50ms" title="hs" />
 
 
 ### Planificabilidad de prioridades fijas y desalojo, herencia de prioridad y techo de prioridad inmediato.
 
 El sistema es planificable si los tiempos de respuesta (R) son menores o iguales a su plazo:
 
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;R_{i}{\leq}D_{i}{\;\;}{\forall} i" title="planificabilidad" />
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;R_{i}{\leq}D_{i}{\;\;}{\forall}i" title="planificabilidad" />
 
 Como todos son mucho mayores que sus tiempos de ejecución en el caso peor, no es necesario que comprobemos si el sistema es planificable (ya que es obvio que lo es). Este análisis tiene más valor cuando los tiempos de ejecución están más ajustados a los plazos.
-
-
-
-
-
-
-
-
-
-### Tiempos de ejecución de las FSMs:
 
 
 ## MODELADO Y VERIFICACIÓN
