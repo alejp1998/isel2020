@@ -27,7 +27,7 @@ Obtenidos a partir del código en el directorio **characterization**:
 
 ![alt text](https://github.com/alejp1998/isel2020/blob/master/exec_times.png "EXECUTION TIMES")
 
-Los tiempos de ejecución en el caso peor (C) que vamos a usar se corresponden con el máximo tiempo de ejecución de cada una de las FSMs tras dispararlas 1000 veces. Así:
+Los tiempos de ejecución en el caso peor (C) que vamos a usar se corresponden con el máximo tiempo de ejecución de cada una de las FSMs tras dispararlas 1000 veces (mientras interactuamos con ellas haciendo que pasen por todos los estados y transiciones). Así:
 
 * <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{KBD}=384,013{\mu}s" title="ckbd" />
 
@@ -55,13 +55,32 @@ Por otro lado, el disparo de la alarma al detectar presencia es importante que t
 * <img src="https://latex.codecogs.com/svg.latex?\Large&space;D_{SWITCH}=T_{SWITCH}=500ms" title="dswitch" />
 
 
-### Ejecutivo cíclico
+### Ejecutivo cíclico (12)
 
 Para realizar el ejecutivo cíclico necesitamos obtener el hiperperiódo y el subperiodo. Se pueden obtener como: 
 
 <img src="https://latex.codecogs.com/svg.latex?\Large&space;H=m.c.m{\{}T_{KBD},T_{CODE},T_{ALARM},T_{SWITCH}{\}}=500ms" title="h" />
 
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;H=m.c.d{\{}T_{KBD},T_{CODE},T_{ALARM},T_{SWITCH}{\}}=50ms" title="hs" />
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;H_s=m.c.d{\{}T_{KBD},T_{CODE},T_{ALARM},T_{SWITCH}{\}}=50ms" title="hs" />
+
+Por lo que necesitamos 10 frames, en los cuales:
+
+* KBD debe ejecutarse una vez cada subperiodo.
+* CODE debe ejecutarse una vez cada subperiodo.
+* ALARM debe ejecutarse una vez cinco subperiodos.
+* SWITCH debe ejecutarse una vez diez subperiodos.
+
+### Asignación de prioridades (13 y 14)
+
+La asignación de prioridades es la óptima en la mayoría de los casos, monótona en plazo. Esto implica que a las FSMs con menor plazo les vamos a asignar prioridades más altas. Así:
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;P_{KBD}=4" title="ckbd" />
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;P_{CODE}=3" title="ccode" />
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;P_{ALARM}=2" title="calarm" />
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;P_{SWITCH}=1" title="cswitch" />
 
 
 ### Planificabilidad de prioridades fijas y desalojo, herencia de prioridad y techo de prioridad inmediato.
