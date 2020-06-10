@@ -55,6 +55,19 @@ Por otro lado, el disparo de la alarma al detectar presencia es importante que t
 * <img src="https://latex.codecogs.com/svg.latex?\Large&space;D_{SWITCH}=T_{SWITCH}=500ms" title="dswitch" />
 
 
+### Ejecutivo cíclico
+
+
+
+### Planificabilidad de prioridades fijas y desalojo, herencia de prioridad y techo de prioridad inmediato.
+
+El sistema es planificable si los tiempos de respuesta (R) son menores o iguales a su plazo:
+
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;R_{i}{\leq}D_{i}{\;\;}{\forall} i" title="planificabilidad" />
+
+Como todos son mucho mayores que sus tiempos de ejecución en el caso peor, no es necesario que comprobemos si el sistema es planificable (ya que es obvio que lo es). Este análisis tiene más valor cuando los tiempos de ejecución están más ajustados a los plazos.
+
+
 
 
 
