@@ -18,9 +18,19 @@ Como el 12 pero implementado con threads.
 
 Como el 12 pero implementado con un Reactor.
 
-## Directorio "spin"
 
-Contiene los modelos en promela y especificaciones correspondientes a las tres máquinas de estados de los ejercicios 12, 13 y 14; verificando también que la interacción entre "alarm" y "code" es correcta:
+## PLANIFICACIÓN
+
+### Tiempos de ejecución de las FSMs:
+
+Obtenidos a partir del código en el directorio **characterization**:
+
+![alt text](https://github.com/alejp1998/isel2020/blob/master/exec_times.png "EXECUTION TIMES")
+
+
+## MODELADO Y VERIFICACIÓN
+
+**Directorio "spin":** contiene los modelos en promela y especificaciones correspondientes a las tres máquinas de estados de los ejercicios 12, 13 y 14; verificando también que la interacción entre "alarm" y "code" es correcta:
 
 * **switch.pml :** modelo en Promela del interruptor, para verificar sus propiedades basta con ejecutar el comando "make switch" dentro del directorio "spin".
     
