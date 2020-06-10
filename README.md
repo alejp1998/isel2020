@@ -27,7 +27,7 @@ Obtenidos a partir del código en el directorio **characterization**:
 
 ![alt text](https://github.com/alejp1998/isel2020/blob/master/exec_times.png "EXECUTION TIMES")
 
-Los tiempos de ejecución en el caso peor <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{i}" title="ci" /> que vamos a usar se corresponden con el máximo tiempo de ejecución de cada una de las FSMs tras dispararlas 1000 veces. Así:
+Los tiempos de ejecución en el caso peor (C) que vamos a usar se corresponden con el máximo tiempo de ejecución de cada una de las FSMs tras dispararlas 1000 veces. Así:
 
 * <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{KBD}=384,013{\mu}s" title="ckbd" />
 
@@ -36,6 +36,33 @@ Los tiempos de ejecución en el caso peor <img src="https://latex.codecogs.com/s
 * <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{ALARM}=37,632{\mu}s" title="calarm" />
 
 * <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{SWITCH}=34,867{\mu}s" title="cswitch" />
+
+Como podemos ver son todos bastante bajos (no llegan a 1ms). Los que más tardan se corresponden con las FSMs de mayor complejidad, como era esperado.
+
+### Asignación de plazos y periódos:
+Se ha realizado arbitrariamente, dándoles el mismo valor a los plazos y los periódos. 
+
+Las FSMs con menor plazo son KBD y CODE, ya que se encargan de leer el teclado y activar o desactivar la alarma a partir del código introducido. Por ello les hemos asignado los siguientes plazos (D) y periódos (T):
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;D_{KBD}=T_{KBD}=50ms" title="dkbd" />
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;D_{CODE}=T_{CODE}=50ms" title="dcode" />
+
+Por otro lado, el disparo de la alarma al detectar presencia es importante que tenga lugar rápido, mientras que el switch de la alarma no es muy importante que se ejecute con tanta frecuencia, por eso les hemos asignado los siguientes valores:
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;D_{ALARM}=T_{ALARM}=250ms" title="dalarm" />
+
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;D_{SWITCH}=T_{SWITCH}=500ms" title="dswitch" />
+
+
+
+
+
+
+
+
+
+### Tiempos de ejecución de las FSMs:
 
 
 ## MODELADO Y VERIFICACIÓN
