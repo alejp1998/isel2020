@@ -1,4 +1,5 @@
 # ISEL 2020 - EJERCICIOS
+# Autor: Alejandro Jarabo Peñas
 
 Ejercicios realizados para la asignatura de "Ingeniería de Sistemas Electrónicos (ISEL)" en el curso 2019/2020. Todos los ejercicios tienen un Makefile asociado, por lo que pueden compilarse haciendo "make" en su directorio correspondiente, así como borrar los archivos que genera al compilar haciendo "make clean".
 
