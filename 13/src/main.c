@@ -34,9 +34,6 @@ static void* kbd_task (void* arg) {
         delay_until (&next);
 
         fsm_fire(kbd_fsm);
-
-        update_code_timer();
-        update_switch_timer();
     }
 }
 

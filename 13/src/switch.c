@@ -1,11 +1,16 @@
 
 
 #include "switch.h"
-  
 
-static int ticks = 0;
+#define DEBOUNCE_TIME 200
+#define TIMER_PERIOD_SEG 10 //10seg
+
 static int button = 0;
 static int timer_ended = 0;
+
+static struct timespec now;
+static struct timespec end;
+static struct timespec T = {TIMER_PERIOD_SEG, 0};
 
 static int debounceTime = DEBOUNCE_TIME;
 
@@ -28,22 +33,12 @@ void timer_switch_isr(void) {
 }
 
 
-//TIMER UPDATE
+//TIMER START
 static void start_switch_timer(){
-  ticks = 0;
-}
-
-void update_switch_timer(){
-  if ((ticks > -1) & (ticks < SWITCH_TMR_TICKS)){
-    //Increase ticks
-    ticks++;
-  } else if (ticks >= SWITCH_TMR_TICKS) {
-    //Set ticks to -1
-    ticks = -1;
-    //Trigger function
-    timer_switch_isr();
-  }
-  //printf("%d",ticks);
+  //Start time
+  clock_gettime(CLOCK_REALTIME, &end);
+  //End time
+  timespec_add(&end,&end,&T);
 }
 
 
@@ -52,8 +47,9 @@ static int check_pressed_button (fsm_t* this) {
   return button; 
 }
 
-static int check_switch_timer_ended (fsm_t* this) { 
-  return timer_ended; 
+static int check_switch_timer_ended (fsm_t* this) {
+  clock_gettime(CLOCK_REALTIME, &now); 
+  return timespec_less (&end, &now); //True if end < now
 }
 
 

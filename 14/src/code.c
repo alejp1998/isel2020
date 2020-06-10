@@ -1,13 +1,21 @@
 #include "code.h"
 
+#define DEBOUNCE_TIME 50
+#define TIMER_PERIOD_SEG 1 //1seg
+#define COUNT_LIMIT 10
+#define CODE_LENGTH 3
+
 static const int correct_code[CODE_LENGTH] = {1, 2, 3};
 
-static int ticks = 0;
 static int key = 0;
 static int timer_ended = 0;
 static int count = 0;
 static int index = 0;
 static int current_code[CODE_LENGTH] = {0,0,0};
+
+static struct timespec now;
+static struct timespec end;
+static struct timespec T = {TIMER_PERIOD_SEG, 0};
 
 static int debounceTime = DEBOUNCE_TIME;
 
@@ -30,22 +38,12 @@ void timer_code_isr (void) {
 }
 
 
-//TIMER UPDATE
+//TIMER START
 static void start_code_timer(){
-  ticks = 0;
-}
-
-void update_code_timer(){
-  if ((ticks > -1) & (ticks < CODE_TMR_TICKS)){
-    //Increase ticks
-    ticks++;
-  } else if (ticks >= CODE_TMR_TICKS) {
-    //Set ticks to -1
-    ticks = -1;
-    //Trigger function
-    timer_code_isr();
-  }
-  //printf("%d",ticks);
+  //Start time
+  clock_gettime(CLOCK_REALTIME, &end);
+  //End time
+  timespec_add(&end,&end,&T);
 }
 
 
@@ -59,15 +57,12 @@ static int check_count_limit (fsm_t* this) {
 }
 
 static int check_code_timer_ended (fsm_t* this) { 
-  return timer_ended; 
+  clock_gettime(CLOCK_REALTIME, &now);
+  return timespec_less (&end, &now); //True if end < now
 }
 
 static int check_code_ended (fsm_t* this) { 
   return index >= CODE_LENGTH; 
-}
-
-static int check_code_not_ended (fsm_t* this) { 
-  return index < CODE_LENGTH; 
 }
 
 

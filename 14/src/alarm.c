@@ -1,6 +1,8 @@
 
 #include "alarm.h"
 
+#define DEBOUNCE_TIME 200
+
 static int alarm_code = 0;
 static int pir_sensor = 0;
 static int debounceTime = DEBOUNCE_TIME;

@@ -13,8 +13,6 @@
 #define GPIO_LIGHT	  4
 #define GPIO_BUZZER	  2
 
-#define DEBOUNCE_TIME 200
-
 enum alarm_fsm_states {
   INACTIVE,
   ACTIVE,
@@ -23,7 +21,7 @@ enum alarm_fsm_states {
 
 //INTERRUPTIONS
 void pir_isr         (void);
-void alarm_state_isr (void);
+void alarm_code_isr (void);
 
 //FSM DEFINITION
 fsm_t* fsm_new_alarm (void);

@@ -11,46 +11,38 @@
 
 //FSM Declarations
 static fsm_t* kbd_fsm;
-static const struct timeval kbd_period = {0, 50*1000000};
-
 static fsm_t* switch_fsm;
-static const struct timeval switch_period = {0, 500*1000000};
-
 static fsm_t* alarm_fsm;
-static const struct timeval alarm_period = {0, 250*1000000};
-
 static fsm_t* code_fsm;
-static const struct timeval code_period = {0, 50*1000000};
 
 
 //REACTOR EVENTS
 //Process key task and update timers state
 static void kbd_task (struct event_handler_t* this) {
+    static const struct timeval period = {0, 0.05*1000000};
     fsm_fire(kbd_fsm);
-
-    //Update timers
-    update_code_timer();
-    update_switch_timer();
-
-    timeval_add (&this->next_activation, &this->next_activation, &kbd_period);
+    timeval_add (&this->next_activation, &this->next_activation, &period);
 }
 
 //Alarm fsm task
 static void alarm_task (struct event_handler_t* this) {
+    static const struct timeval period = {0, 0.25*1000000};
     fsm_fire(alarm_fsm);
-    timeval_add (&this->next_activation, &this->next_activation, &alarm_period);
+    timeval_add (&this->next_activation, &this->next_activation, &period);
 }
 
 //Code fsm task
 static void code_task (struct event_handler_t* this) {
+    static const struct timeval period = {0, 0.5*1000000};
     fsm_fire(code_fsm);
-    timeval_add (&this->next_activation, &this->next_activation, &code_period);
+    timeval_add (&this->next_activation, &this->next_activation, &period);
 }
 
 //Switch fsm task
 static void switch_task (struct event_handler_t* this) {
+    static const struct timeval period = {0, 0.5*1000000};
     fsm_fire(switch_fsm);
-    timeval_add (&this->next_activation, &this->next_activation, &switch_period);
+    timeval_add (&this->next_activation, &this->next_activation, &period);
 }
 
 

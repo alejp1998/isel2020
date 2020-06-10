@@ -1,8 +1,6 @@
 
 #include "kbd.h"
 
-static char last_key = 0;
-
 static int chk_input (fsm_t* this) {
 	fd_set rdset;
 	struct timeval timeout = {0,0};

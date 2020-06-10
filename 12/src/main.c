@@ -57,10 +57,6 @@ int main () {
     int frame = 0;
 
     while (1) {
-        //Update timers
-        update_code_timer();
-        update_switch_timer();
-        
         /* 
         CYCLIC EXECUTIVE (H = 500ms)
             KBD_FSM    -> T = 50ms
