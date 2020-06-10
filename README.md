@@ -27,6 +27,13 @@ Obtenidos a partir del código en el directorio **characterization**:
 
 ![alt text](https://github.com/alejp1998/isel2020/blob/master/exec_times.png "EXECUTION TIMES")
 
+Los tiempos de ejecución en el caso peor \\( C_i \\) que vamos a usar se corresponden con el máximo tiempo de ejecución de cada una de las FSMs tras dispararlas 1000 veces. Así:
+
+\\[ C_{KBD} = 384,013\mu s \\]
+\\[ C_{CODE} = 30,201\mu s \\]
+\\[ C_{ALARM} = 37,632\mu s \\]
+\\[ C_{SWITCH} = 34,867\mu s \\]
+
 
 ## MODELADO Y VERIFICACIÓN
 
