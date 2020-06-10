@@ -27,15 +27,15 @@ Obtenidos a partir del código en el directorio **characterization**:
 
 ![alt text](https://github.com/alejp1998/isel2020/blob/master/exec_times.png "EXECUTION TIMES")
 
-Los tiempos de ejecución en el caso peor \\( C_i \\) que vamos a usar se corresponden con el máximo tiempo de ejecución de cada una de las FSMs tras dispararlas 1000 veces. Así:
+Los tiempos de ejecución en el caso peor <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{i}" title="ci" /> que vamos a usar se corresponden con el máximo tiempo de ejecución de cada una de las FSMs tras dispararlas 1000 veces. Así:
 
-* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{KBD}=384,013\mu s" title="\Large x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}" />
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{KBD}=384,013{\mu}s" title="ckbd" />
 
-* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{CODE}=30,201\mu s" title="\Large x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}" />
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{CODE}=30,201{\mu}s" title="ccode" />
 
-* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{ALARM}=37,632\mu s" title="\Large x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}" />
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{ALARM}=37,632{\mu}s" title="calarm" />
 
-* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{SWITCH}=34,867\mu s" title="\Large x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}" />
+* <img src="https://latex.codecogs.com/svg.latex?\Large&space;C_{SWITCH}=34,867{\mu}s" title="cswitch" />
 
 
 ## MODELADO Y VERIFICACIÓN
