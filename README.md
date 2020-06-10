@@ -83,7 +83,7 @@ La asignación de prioridades es la óptima en la mayoría de los casos, monóto
 * <img src="https://latex.codecogs.com/svg.latex?\Large&space;P_{SWITCH}=1" title="cswitch" />
 
 
-### Planificabilidad de prioridades fijas y desalojo, herencia de prioridad y techo de prioridad inmediato.
+### Planificabilidad de prioridades fijas y desalojo, herencia de prioridad y techo de prioridad inmediato (13 y 14)
 
 El sistema es planificable si los tiempos de respuesta (R) son menores o iguales a su plazo:
 
